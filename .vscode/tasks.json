@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "harmonia-build-csharp-if-present",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "$project = Get-ChildItem -Path . -Filter *.csproj -ErrorAction SilentlyContinue; if ($project) { dotnet build } else { Write-Host 'No .csproj found yet. Skipping C# build.' }"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "build"
+        }
+    ]
+}

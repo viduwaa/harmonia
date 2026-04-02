@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://cob2uc6g6vcwr"]
+
+[ext_resource type="Script" uid="uid://duk5o8f3t0r4d" path="res://src/gd/ui/TestScene.gd" id="1_u7fqp"]
+
+[node name="TestScene" type="Control" unique_id=947319898]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_u7fqp")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=666706644]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -110.0
+offset_right = 240.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=168927542]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1423919080]
+layout_mode = 2
+text = "Harmonia Audio Processor Test"
+horizontal_alignment = 1
+
+[node name="FrequencyLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=670056530]
+layout_mode = 2
+text = "Detected Frequency"
+
+[node name="FrequencyValue" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1244505879]
+layout_mode = 2
+text = "-- Hz"
+
+[node name="NoteLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=328195499]
+layout_mode = 2
+text = "Detected Note"
+
+[node name="NoteValue" type="Label" parent="MarginContainer/VBoxContainer" unique_id=2144780360]
+layout_mode = 2
+text = "--"
+
+[node name="ConfidenceLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=2037144294]
+layout_mode = 2
+text = "Confidence"
+
+[node name="ConfidenceValue" type="Label" parent="MarginContainer/VBoxContainer" unique_id=2079147213]
+layout_mode = 2
+text = "0.00"
+
+[node name="InputLevelLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=795827801]
+layout_mode = 2
+text = "Input Level"
+
+[node name="InputLevelValue" type="Label" parent="MarginContainer/VBoxContainer" unique_id=354797936]
+layout_mode = 2
+text = "-80.0 dB"
+
+[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Status"
+
+[node name="StatusValue" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Idle"
+
+[node name="ToggleRecordingButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=565359614]
+layout_mode = 2
+text = "Start Recording"

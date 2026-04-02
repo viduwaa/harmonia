@@ -1,0 +1,48 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Harmonia: Play (Godot .NET)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "harmonia-build-csharp-if-present",
+            "program": "${config:godotTools.editorPath.godot4}",
+            "args": ["--path", "${workspaceFolder}"],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "justMyCode": true
+        },
+        {
+            "name": "Harmonia: Open Editor (.NET)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "harmonia-build-csharp-if-present",
+            "program": "${config:godotTools.editorPath.godot4}",
+            "args": ["--editor", "--path", "${workspaceFolder}"],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "justMyCode": true
+        },
+        {
+            "name": "Harmonia: Run TestScene",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "harmonia-build-csharp-if-present",
+            "program": "${config:godotTools.editorPath.godot4}",
+            "args": ["--path", "${workspaceFolder}"],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "justMyCode": true
+        },
+        {
+            "name": "Harmonia: Attach to running Godot",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}",
+            "justMyCode": true
+        }
+    ]
+}

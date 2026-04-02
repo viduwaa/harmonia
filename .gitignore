@@ -1,0 +1,38 @@
+# Godot 4+ engine-generated directories
+.godot/
+.godot/mono/
+
+# Android export
+android/
+
+# C# / .NET (Godot .NET builds)
+.csproj
+.sln
+obj/
+bin/
+*.dll
+*.pdb
+*.exe
+*.xml
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build outputs
+export/
+build/
+*.pck
+*.import
+*.imported
+
+# Mono / Godot .NET
+.mono/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
