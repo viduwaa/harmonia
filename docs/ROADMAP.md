@@ -13,12 +13,16 @@
 - Define shared payloads for note detection, battle resolution, and persistence writes.
 - Confirm audio bus safety assumptions and startup configuration.
 
+Implementation note (2026-04-06): Phase 0 contract baseline is documented in docs/ARCHITECTURE_CONTRACTS.md.
+
 ### Phase 1: Core Audio Prototype
 
 - Implement AudioProcessor singleton lifecycle and microphone capture controls.
 - Implement pitch detection (autocorrelation/YIN style) and Hz-to-note conversion.
 - Build a test scene with start/stop control, live frequency label, and live note label.
 - Add no-feedback defaults, silence floor, and basic confidence gating.
+
+Implementation note (2026-04-06): Phase 1 is complete in current milestone scope (AudioProcessor lifecycle, capture controls, live test scene controls, confidence/noise gating, and no-feedback defaults).
 
 ### Phase 2: Battle Vertical Slice
 
@@ -44,6 +48,8 @@
 - Add diagnostics overlay and performance/latency tuning.
 - Improve calibration and noise robustness.
 - Introduce storage adapter boundary for future SQLite backend swap.
+
+Implementation note (2026-04-06): storage adapter boundary is in place and SQLite adapter behavior is implemented with runtime SQLite detection plus JSON mirror compatibility. Remaining follow-up is runtime evidence capture (parity + snapshot exports) in a SQLite-capable environment.
 
 ## Verification Criteria
 

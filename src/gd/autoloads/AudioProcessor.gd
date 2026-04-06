@@ -17,7 +17,14 @@ const CAPTURE_FRAME_COUNT: int = 2048
 const CSHARP_PITCH_CLASS_NAME: String = "PitchDecisionService"
 const CSHARP_PITCH_SINGLETON_PATH: NodePath = ^"/root/PitchDecisionService"
 const BACKEND_RETRY_INTERVAL_SEC: float = 1.0
-const DETECTION_LOG_INTERVAL_SEC: float = 1.0
+# English note classes used in code with Sinhala solfege reference:
+# C = ඩෝ (Do), C# = ඩෝ ශාප් (Do Sharp)
+# D = රේ (Re), D# = රේ ශාප් (Re Sharp)
+# E = මි (Mi)
+# F = ෆා (Fa), F# = ෆා ශාප් (Fa Sharp)
+# G = සෝ (So), G# = සෝ ශාප් (So Sharp)
+# A = ලා (La), A# = ලා ශාප් (La Sharp)
+# B = ති (Ti)
 const NOTE_NAMES: PackedStringArray = [
 	"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
 ]
@@ -44,9 +51,6 @@ var _detected_confidence: float = 0.0
 var _input_level_db: float = -80.0
 var _status_text: String = "Idle"
 var _last_csharp_skip_reason: String = "C# backend not resolved"
-var _detection_log_elapsed: float = 0.0
-var _last_logged_status: String = ""
-var _last_logged_fallback_reason: String = ""
 
 
 func _ready() -> void:
@@ -70,18 +74,6 @@ func _process(_delta: float) -> void:
 		_resolve_audio_effect_instances()
 		if _spectrum == null:
 			return
-	_detection_log_elapsed += _delta
-	if _detection_log_elapsed >= DETECTION_LOG_INTERVAL_SEC:
-		_detection_log_elapsed = 0.0
-		_log_event(
-			"Snapshot freq=%.2fHz note=%s conf=%.2f input=%.1fdB backend=%s" % [
-				_detected_frequency,
-				_detected_note,
-				_detected_confidence,
-				_input_level_db,
-				_backend_mode
-			]
-		)
 	_update_detection()
 
 
@@ -362,7 +354,6 @@ func _set_backend_mode(mode: String) -> void:
 		return
 	_backend_mode = mode
 	backend_mode_changed.emit(_backend_mode)
-	_log_event("Backend mode changed to %s" % _backend_mode)
 
 
 func _try_csharp_yin_detection() -> Dictionary:
@@ -442,14 +433,10 @@ func _update_detection() -> void:
 	var detection: Dictionary = _try_csharp_yin_detection()
 	if not bool(detection.get("valid", false)):
 		_last_csharp_skip_reason = String(detection.get("reason", "YIN fallback"))
-		if _last_csharp_skip_reason != _last_logged_fallback_reason:
-			_last_logged_fallback_reason = _last_csharp_skip_reason
-			_log_event("C# fallback reason: %s" % _last_csharp_skip_reason)
 		detection = _analyze_spectrum_bins()
 		detection["fallback_reason"] = _last_csharp_skip_reason
 	else:
 		_last_csharp_skip_reason = ""
-		_last_logged_fallback_reason = ""
 
 	var raw_frequency: float = float(detection.get("frequency", 0.0))
 	var confidence: float = float(detection.get("confidence", 0.0))
@@ -479,10 +466,13 @@ func _update_detection() -> void:
 		note_detected.emit(0.0, "--", confidence)
 		return
 
+	var previous_note: String = _detected_note
 	_detected_frequency = next_frequency
 	_detected_note = next_note
 	_detected_confidence = confidence
 	var source: String = String(detection.get("source", _backend_mode))
+	if previous_note != next_note:
+		_log_note_capture(source, next_frequency, next_note, confidence)
 	if source == "GDScriptFFT" and String(detection.get("fallback_reason", "")) != "":
 		_set_status("Capturing (%s: %s)" % [source, String(detection.get("fallback_reason", ""))])
 	else:
@@ -502,10 +492,17 @@ func _clear_detection(status: String) -> void:
 
 func _set_status(status: String) -> void:
 	_status_text = status
-	if _status_text == _last_logged_status:
-		return
-	_last_logged_status = _status_text
-	_log_event("Status changed: %s" % _status_text)
+
+
+func _log_note_capture(source: String, frequency: float, note_name: String, confidence: float) -> void:
+	_log_event(
+		"Note captured source=%s note=%s frequency=%.2fHz confidence=%.2f" % [
+			source,
+			note_name,
+			frequency,
+			confidence
+		]
+	)
 
 
 func _log_event(message: String) -> void:

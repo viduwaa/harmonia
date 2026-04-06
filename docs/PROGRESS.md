@@ -1,6 +1,6 @@
 # Harmonia Progress
 
-Updated: 2026-04-02
+Updated: 2026-04-06
 
 ## Master Checklist
 
@@ -22,21 +22,47 @@ Updated: 2026-04-02
 - [x] YIN implementation rechecked and corrected end-to-end (GDScript bridge + C# service + capture bus)
 - [x] Runtime diagnostics and TestScene log panel added for audio backend troubleshooting
 - [x] Live UI calibration controls (signal threshold, confidence, stable frames) fully wired to AudioProcessor
-- [ ] Phase 0 Architecture Contracts implementation
-- [ ] Phase 1 Core Audio Prototype implementation
-- [ ] Phase 2 Battle Vertical Slice implementation
-- [ ] Phase 3 Local JSON Persistence implementation
-- [ ] Phase 4 Game Flow Integration implementation
-- [ ] Phase 5 Hardening and migration prep
+- [x] LocalDataManager JSON persistence added for audio calibration and input device selection
+- [x] BattleManager vertical slice implemented with turn loop, hit grading, and HP resolution
+- [x] Deterministic battle config controls (seed + forced patterns) and JSON persistence wired via LocalDataManager
+- [x] NOTE_ATTEMPT and GAME_SESSION payload contracts added to BattleManager event flow
+- [x] NOTE_ATTEMPT and GAME_SESSION JSONL persistence wired (BattleManager signals -> LocalDataManager append APIs)
+- [x] GameStateManager session lifecycle and progression persistence flow integrated
+- [x] JSONL retention compaction and runtime diagnostics summary logging added
+- [x] In-UI save diagnostics tools added (stats, compact, reset logs, export snapshot)
+- [x] Configurable retention thresholds added (persisted + in-UI controls)
+- [x] Auto-clean policies added (time-based + size-based) with startup/session execution
+- [x] Startup save diagnostics config and last-cleanup summary logging added
+- [x] In-UI auto-clean policy controls added (enable/age/size thresholds)
+- [x] Guardrail warning lines added for aggressive retention and auto-clean values
+- [x] One-click diagnostics snapshot report export added for QA handoff
+- [x] Migration-readiness checklist/status added to diagnostics snapshot export
+- [x] TestScene snapshot export now logs migration readiness summary line
+- [x] Snapshot exports now auto-generate migration_readiness_index.json across snapshots
+- [x] TestScene export log now reports PASS/WARN/FAIL triplet evidence coverage status
+- [x] Migration readiness QA evidence note added with canonical PASS/WARN snapshot artifacts
+- [x] FAIL snapshot evidence waived with documented risk acceptance
+- [x] LocalDataManager storage adapter boundary introduced with pluggable adapter selection
+- [x] SQLite storage adapter scaffold added behind LocalDataManager persistence API
+- [x] JSON-vs-active adapter write parity utility added for migration testing
+- [x] Runtime-dependent SQLite adapter logic added (documents + JSONL + compatibility mirroring)
+- [x] TestScene storage adapter selector and parity-check trigger controls added
+- [x] C# GlobalClass `SQLite` runtime bridge added using `Microsoft.Data.Sqlite`
+- [x] Phase 0 Architecture Contracts implementation
+- [x] Phase 1 Core Audio Prototype implementation
+- [x] Phase 2 Battle Vertical Slice implementation
+- [x] Phase 3 Local JSON Persistence implementation
+- [x] Phase 4 Game Flow Integration implementation
+- [x] Phase 5 Hardening and migration prep
 
 ## Current Status
 
-- Done: C# backend resolves in runtime, capture path stabilized, status/fallback diagnostics are visible, and TestScene calibration controls now apply live to detection behavior.
-- Next: Close Phase 1 by adding a lightweight calibration profile save/load path in LocalDataManager, then begin BattleManager vertical slice wiring.
+- Done: SQLite adapter behavior is implemented, and runtime `SQLite` class support is now provided in-project via C# bridge.
+- Next: Run and record SQLite parity-check evidence in-editor to confirm class discovery and active adapter usage.
 - Blocked: None.
 
 ## Immediate Next Actions
 
-1. Run TestScene and verify Start/Stop capture with live frequency/note updates.
-2. Tune AudioProcessor thresholds for silence/noise environments.
-3. Confirm backend mode label changes to CSharpYIN during live capture; if not, inspect Godot editor .NET assembly load state.
+1. Run TestScene with SQLite-capable runtime and set adapter to `sqlite_scaffold` in Save Tools.
+2. Execute adapter parity check and archive the result summary as migration evidence.
+3. Export a save snapshot in SQLite mode and confirm diagnostics/report/index outputs remain consistent.

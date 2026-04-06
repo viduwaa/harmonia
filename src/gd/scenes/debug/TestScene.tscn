@@ -13,133 +13,317 @@ script = ExtResource("1_u7fqp")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=666706644]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -240.0
-offset_top = -210.0
-offset_right = 240.0
-offset_bottom = 210.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 260.0
+offset_top = 24.0
+offset_right = -260.0
+offset_bottom = -24.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=168927542]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 8
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1423919080]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer" unique_id=168927542]
+layout_mode = 2
+theme_override_constants/separation = 4
+size_flags_horizontal = 3
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=1423919080]
 layout_mode = 2
 text = "Harmonia Audio Processor Test"
 horizontal_alignment = 1
 
-[node name="FrequencyLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=670056530]
+[node name="FrequencyLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=670056530]
 layout_mode = 2
 text = "Detected Frequency"
 
-[node name="FrequencyValue" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1244505879]
+[node name="FrequencyValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=1244505879]
 layout_mode = 2
 text = "-- Hz"
 
-[node name="NoteLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=328195499]
+[node name="NoteLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=328195499]
 layout_mode = 2
 text = "Detected Note"
 
-[node name="NoteValue" type="Label" parent="MarginContainer/VBoxContainer" unique_id=2144780360]
+[node name="NoteValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=2144780360]
 layout_mode = 2
 text = "--"
 
-[node name="ConfidenceLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=2037144294]
+[node name="ConfidenceLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=2037144294]
 layout_mode = 2
 text = "Confidence"
 
-[node name="ConfidenceValue" type="Label" parent="MarginContainer/VBoxContainer" unique_id=2079147213]
+[node name="ConfidenceValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=2079147213]
 layout_mode = 2
 text = "0.00"
 
-[node name="InputLevelLabel" type="Label" parent="MarginContainer/VBoxContainer" unique_id=795827801]
+[node name="InputLevelLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=795827801]
 layout_mode = 2
 text = "Input Level"
 
-[node name="InputLevelValue" type="Label" parent="MarginContainer/VBoxContainer" unique_id=354797936]
+[node name="InputLevelValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=354797936]
 layout_mode = 2
 text = "-80.0 dB"
 
-[node name="InputDeviceLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="InputDeviceLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Input Device"
 
-[node name="InputDeviceSelector" type="OptionButton" parent="MarginContainer/VBoxContainer"]
+[node name="InputDeviceSelector" type="OptionButton" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="MinSignalLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="MinSignalLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Min Signal Threshold"
 
-[node name="MinSignalSlider" type="HSlider" parent="MarginContainer/VBoxContainer"]
+[node name="MinSignalSlider" type="HSlider" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 min_value = -80.0
 max_value = -20.0
 step = 1.0
 value = -58.0
 
-[node name="MinSignalValue" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="MinSignalValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "-58.0 dB"
 
-[node name="MinConfidenceLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="MinConfidenceLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Min Confidence"
 
-[node name="MinConfidenceSlider" type="HSlider" parent="MarginContainer/VBoxContainer"]
+[node name="MinConfidenceSlider" type="HSlider" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 max_value = 1.0
 step = 0.01
 value = 0.12
 
-[node name="MinConfidenceValue" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="MinConfidenceValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "0.12"
 
-[node name="StabilityFramesLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="StabilityFramesLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Stable Frames Required"
 
-[node name="StabilityFramesSpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer"]
+[node name="StabilityFramesSpinBox" type="SpinBox" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 min_value = 1.0
 max_value = 12.0
 step = 1.0
 value = 3.0
 
-[node name="BackendLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="BackendLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Detection Backend"
 
-[node name="BackendValue" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="BackendValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "GDScript"
 
-[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="BattleTargetLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Battle Target"
+
+[node name="BattleTargetValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "--"
+
+[node name="BattleTurnLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Battle Turn"
+
+[node name="BattleTurnValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "0"
+
+[node name="BattleTimeLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Turn Time Left"
+
+[node name="BattleTimeValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "0.0s"
+
+[node name="PlayerHpLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Player HP"
+
+[node name="PlayerHpValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "100"
+
+[node name="EnemyHpLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Enemy HP"
+
+[node name="EnemyHpValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "100"
+
+[node name="DeterministicModeLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Deterministic Battle Mode"
+
+[node name="DeterministicModeCheckBox" type="CheckBox" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Enabled"
+
+[node name="DeterministicSeedLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Deterministic Seed"
+
+[node name="DeterministicSeedSpinBox" type="SpinBox" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 0.0
+max_value = 2147483647.0
+step = 1.0
+value = 1337.0
+
+[node name="ForcedTargetQueueLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Forced Target Queue (comma-separated patterns)"
+
+[node name="ForcedTargetQueueEdit" type="LineEdit" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "C4+E4, D4, A4/A#4+G4"
+
+[node name="ApplyBattleConfigButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Apply Battle Config"
+
+[node name="StatusLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Status"
 
-[node name="StatusValue" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="StatusValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Idle"
 
-[node name="LogLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="LogLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Runtime Log"
 
-[node name="LogValue" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 140)
+[node name="LogValue" type="RichTextLabel" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 bbcode_enabled = false
 scroll_following = true
 text = ""
 
-[node name="ToggleRecordingButton" type="Button" parent="MarginContainer/VBoxContainer" unique_id=565359614]
+[node name="SaveToolsLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Save Tools"
+
+[node name="RetentionLimitsLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Retention Limits"
+
+[node name="NoteRetentionLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Max Note Attempt Records"
+
+[node name="NoteRetentionSpinBox" type="SpinBox" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 100.0
+max_value = 50000.0
+step = 100.0
+value = 4000.0
+
+[node name="SessionRetentionLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Max Game Session Records"
+
+[node name="SessionRetentionSpinBox" type="SpinBox" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 10.0
+max_value = 5000.0
+step = 10.0
+value = 500.0
+
+[node name="ApplyRetentionButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Apply Retention Limits"
+
+[node name="AutoCleanLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Auto-Clean Policy"
+
+[node name="AutoCleanEnabledCheckBox" type="CheckBox" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Enable Auto-Clean"
+button_pressed = true
+
+[node name="AutoCleanAgeDaysLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Max Record Age (days)"
+
+[node name="AutoCleanAgeDaysSpinBox" type="SpinBox" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 3650.0
+step = 1.0
+value = 30.0
+
+[node name="AutoCleanNoteFileMbLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Max Note Attempts File Size (MB)"
+
+[node name="AutoCleanNoteFileMbSpinBox" type="SpinBox" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 0.1
+max_value = 1024.0
+step = 0.1
+value = 8.0
+
+[node name="AutoCleanSessionFileMbLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Max Game Sessions File Size (MB)"
+
+[node name="AutoCleanSessionFileMbSpinBox" type="SpinBox" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 0.1
+max_value = 1024.0
+step = 0.1
+value = 2.0
+
+[node name="ApplyAutoCleanPolicyButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Apply Auto-Clean Policy"
+
+[node name="StorageAdapterLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Storage Adapter"
+
+[node name="StorageAdapterSelector" type="OptionButton" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="RunAdapterParityCheckButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Run Adapter Parity Check"
+
+[node name="LogStatsValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Attempts:0/0 Sessions:0/0"
+
+[node name="RefreshStatsButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Refresh Save Stats"
+
+[node name="CompactLogsButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Compact JSONL Logs"
+
+[node name="ExportSavesButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Export Save Snapshot"
+
+[node name="ResetLogsButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Reset Battle Logs"
+
+[node name="ToggleRecordingButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=565359614]
 layout_mode = 2
 text = "Start Recording"
