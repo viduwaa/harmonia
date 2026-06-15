@@ -68,6 +68,22 @@ text = "Input Level"
 layout_mode = 2
 text = "-80.0 dB"
 
+[node name="NoiseFloorLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Estimated Noise Floor"
+
+[node name="NoiseFloorValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "-80.0 dB"
+
+[node name="EffectiveThresholdLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Effective Signal Threshold"
+
+[node name="EffectiveThresholdValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "-58.0 dB"
+
 [node name="InputDeviceLabel" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Input Device"
@@ -304,6 +320,14 @@ layout_mode = 2
 layout_mode = 2
 text = "Run Adapter Parity Check"
 
+[node name="LogSqliteHealthSummaryButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Log SQLite Health Summary"
+
+[node name="RunSqliteQaCycleButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Run SQLite QA Cycle"
+
 [node name="LogStatsValue" type="Label" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Attempts:0/0 Sessions:0/0"
@@ -323,6 +347,10 @@ text = "Export Save Snapshot"
 [node name="ResetLogsButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 text = "Reset Battle Logs"
+
+[node name="OpenWorldButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Enter Explore World (F8)"
 
 [node name="ToggleRecordingButton" type="Button" parent="MarginContainer/ScrollContainer/VBoxContainer" unique_id=565359614]
 layout_mode = 2

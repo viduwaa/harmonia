@@ -33,6 +33,30 @@ func get_level_progress() -> Dictionary:
 	return _level_progress.duplicate(true)
 
 
+func grant_exploration_rewards(xp_bonus: int) -> bool:
+	var normalized_bonus: int = max(xp_bonus, 0)
+	if normalized_bonus <= 0:
+		return true
+
+	if _profile == null or _profile.is_empty():
+		_load_progress_documents()
+
+	_profile["xp_total"] = int(_profile.get("xp_total", 0)) + normalized_bonus
+	_profile["last_updated_unix_sec"] = int(Time.get_unix_time_from_system())
+
+	if _local_data_manager == null or not _local_data_manager.has_method("save_profile"):
+		push_warning("GameStateManager: Cannot persist exploration rewards (LocalDataManager missing).")
+		return false
+
+	var profile_saved: bool = bool(_local_data_manager.call("save_profile", _profile))
+	if not profile_saved:
+		push_warning("GameStateManager: Failed to persist exploration reward XP.")
+		return false
+
+	progression_updated.emit(_profile.duplicate(true), _level_progress.duplicate(true))
+	return true
+
+
 func _bind_runtime_managers() -> void:
 	_local_data_manager = get_node_or_null("/root/LocalDataManager")
 	if _local_data_manager == null:

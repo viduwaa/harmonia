@@ -1,0 +1,185 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/gd/ui/PlayerFlowScene.gd" id="1_t2x4h"]
+[ext_resource type="PackedScene" path="res://src/gd/scenes/player/PlayerHudScene.tscn" id="2_d63jy"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/flow_header_icon.svg" id="3_pq6a2"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/flow_action_strip_icon.svg" id="4_h2k8m"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_card"]
+bg_color = Color(0.0627451, 0.0941176, 0.137255, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.301961, 0.611765, 0.741176, 0.82)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.2)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action_strip"]
+bg_color = Color(0.0470588, 0.0784314, 0.121569, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.321569, 0.654902, 0.788235, 0.88)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.24)
+shadow_size = 12
+
+[node name="PlayerFlowScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_t2x4h")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0666667, 0.0941176, 0.145098, 1)
+
+[node name="HeaderPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -320.0
+offset_top = 14.0
+offset_right = 320.0
+offset_bottom = 92.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel_card")
+
+[node name="HeaderMargin" type="MarginContainer" parent="HeaderPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="HeaderContent" type="VBoxContainer" parent="HeaderPanel/HeaderMargin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HeaderIconSlot" type="TextureRect" parent="HeaderPanel/HeaderMargin/HeaderContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("3_pq6a2")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(0.682353, 0.882353, 0.964706, 0.9)
+
+[node name="HeaderLabel" type="Label" parent="HeaderPanel/HeaderMargin/HeaderContent"]
+layout_mode = 2
+text = "Harmonia Player Session"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.917647, 0.964706, 1, 1)
+
+[node name="HeaderSubLabel" type="Label" parent="HeaderPanel/HeaderMargin/HeaderContent"]
+layout_mode = 2
+text = "Core loop controls outside debug tooling (F8: Explore World)"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.666667, 0.823529, 0.905882, 1)
+
+[node name="PlayerHud" parent="." instance=ExtResource("2_d63jy")]
+
+[node name="ActionStripPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -320.0
+offset_top = -128.0
+offset_right = 320.0
+offset_bottom = -70.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_action_strip")
+
+[node name="MarginContainer" type="MarginContainer" parent="ActionStripPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="ActionStripRow" type="HBoxContainer" parent="ActionStripPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ActionStripIconSlot" type="TextureRect" parent="ActionStripPanel/MarginContainer/ActionStripRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("4_h2k8m")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(0.701961, 0.901961, 0.984314, 0.9)
+
+[node name="ToggleListeningButton" type="Button" parent="ActionStripPanel/MarginContainer/ActionStripRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Start Listening"
+theme_override_colors/font_color = Color(0.0627451, 0.0941176, 0.137255, 1)
+
+[node name="ResetBattleButton" type="Button" parent="ActionStripPanel/MarginContainer/ActionStripRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Reset Battle"
+theme_override_colors/font_color = Color(0.0627451, 0.0941176, 0.137255, 1)
+
+[node name="ActionStatusLabel" type="Label" parent="ActionStripPanel/MarginContainer/ActionStripRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Listening idle"
+horizontal_alignment = 2
+vertical_alignment = 1
+theme_override_colors/font_color = Color(0.890196, 0.94902, 0.984314, 1)
+
+[node name="DebugToolsButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -56.0
+offset_right = -24.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Open Debug Tools"
+
+[node name="ExploreWorldButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -272.0
+offset_top = 108.0
+offset_right = -24.0
+offset_bottom = 146.0
+grow_horizontal = 0
+text = "Enter Explore World (F8)"
+theme_override_colors/font_color = Color(0.0627451, 0.0941176, 0.137255, 1)

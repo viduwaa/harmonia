@@ -1,0 +1,28 @@
+[gd_resource type="Resource" load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://src/gd/ui/skins/UiSkin.gd" id="1_ui_skin"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/menu_logo_icon.svg" id="2_menu_logo"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/menu_start_icon.svg" id="3_menu_start"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/menu_practice_icon.svg" id="4_menu_practice"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/menu_quit_icon.svg" id="5_menu_quit"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/flow_header_icon.svg" id="6_flow_header"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/flow_action_strip_icon.svg" id="7_flow_action_strip"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/hud_live_input_icon.svg" id="8_hud_live_input"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/hud_battle_state_icon.svg" id="9_hud_battle_state"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/hud_session_summary_icon.svg" id="10_hud_session_summary"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/boss_gate_icon.svg" id="11_boss_gate"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/enemy_encounter_icon.svg" id="12_enemy_encounter"]
+
+[resource]
+script = ExtResource("1_ui_skin")
+menu_logo_icon = ExtResource("2_menu_logo")
+menu_start_icon = ExtResource("3_menu_start")
+menu_practice_icon = ExtResource("4_menu_practice")
+menu_quit_icon = ExtResource("5_menu_quit")
+flow_header_icon = ExtResource("6_flow_header")
+flow_action_strip_icon = ExtResource("7_flow_action_strip")
+hud_live_input_icon = ExtResource("8_hud_live_input")
+hud_battle_state_icon = ExtResource("9_hud_battle_state")
+hud_session_summary_icon = ExtResource("10_hud_session_summary")
+boss_gate_icon = ExtResource("11_boss_gate")
+enemy_encounter_icon = ExtResource("12_enemy_encounter")

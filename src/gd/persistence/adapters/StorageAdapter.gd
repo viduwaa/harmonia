@@ -43,3 +43,7 @@ func truncate_file(_file_path: String) -> bool:
 
 func get_file_size_bytes(_file_path: String) -> int:
 	return 0
+
+
+func file_exists(_file_path: String) -> bool:
+	return false

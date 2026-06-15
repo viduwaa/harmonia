@@ -1,9 +1,13 @@
 extends Control
 
+const EXPLORE_WORLD_SCENE_PATH: String = "res://src/gd/scenes/world/ExploreWorldScene.tscn"
+
 @onready var _frequency_value_label: Label = $MarginContainer/ScrollContainer/VBoxContainer/FrequencyValue
 @onready var _note_value_label: Label = $MarginContainer/ScrollContainer/VBoxContainer/NoteValue
 @onready var _confidence_value_label: Label = $MarginContainer/ScrollContainer/VBoxContainer/ConfidenceValue
 @onready var _input_level_value_label: Label = $MarginContainer/ScrollContainer/VBoxContainer/InputLevelValue
+@onready var _noise_floor_value_label: Label = $MarginContainer/ScrollContainer/VBoxContainer/NoiseFloorValue
+@onready var _effective_threshold_value_label: Label = $MarginContainer/ScrollContainer/VBoxContainer/EffectiveThresholdValue
 @onready var _input_device_selector: OptionButton = $MarginContainer/ScrollContainer/VBoxContainer/InputDeviceSelector
 @onready var _min_signal_slider: HSlider = $MarginContainer/ScrollContainer/VBoxContainer/MinSignalSlider
 @onready var _min_signal_value_label: Label = $MarginContainer/ScrollContainer/VBoxContainer/MinSignalValue
@@ -32,11 +36,14 @@ extends Control
 @onready var _apply_auto_clean_policy_button: Button = $MarginContainer/ScrollContainer/VBoxContainer/ApplyAutoCleanPolicyButton
 @onready var _storage_adapter_selector: OptionButton = $MarginContainer/ScrollContainer/VBoxContainer/StorageAdapterSelector
 @onready var _run_adapter_parity_check_button: Button = $MarginContainer/ScrollContainer/VBoxContainer/RunAdapterParityCheckButton
+@onready var _log_sqlite_health_summary_button: Button = $MarginContainer/ScrollContainer/VBoxContainer/LogSqliteHealthSummaryButton
+@onready var _run_sqlite_qa_cycle_button: Button = $MarginContainer/ScrollContainer/VBoxContainer/RunSqliteQaCycleButton
 @onready var _log_stats_value_label: Label = $MarginContainer/ScrollContainer/VBoxContainer/LogStatsValue
 @onready var _refresh_stats_button: Button = $MarginContainer/ScrollContainer/VBoxContainer/RefreshStatsButton
 @onready var _compact_logs_button: Button = $MarginContainer/ScrollContainer/VBoxContainer/CompactLogsButton
 @onready var _export_saves_button: Button = $MarginContainer/ScrollContainer/VBoxContainer/ExportSavesButton
 @onready var _reset_logs_button: Button = $MarginContainer/ScrollContainer/VBoxContainer/ResetLogsButton
+@onready var _open_world_button: Button = $MarginContainer/ScrollContainer/VBoxContainer/OpenWorldButton
 @onready var _toggle_button: Button = $MarginContainer/ScrollContainer/VBoxContainer/ToggleRecordingButton
 
 var _audio_processor: Node
@@ -77,10 +84,13 @@ func _ready() -> void:
 	_apply_auto_clean_policy_button.pressed.connect(_on_apply_auto_clean_policy_pressed)
 	_storage_adapter_selector.item_selected.connect(_on_storage_adapter_selected)
 	_run_adapter_parity_check_button.pressed.connect(_on_run_adapter_parity_check_pressed)
+	_log_sqlite_health_summary_button.pressed.connect(_on_log_sqlite_health_summary_pressed)
+	_run_sqlite_qa_cycle_button.pressed.connect(_on_run_sqlite_qa_cycle_pressed)
 	_refresh_stats_button.pressed.connect(_on_refresh_stats_pressed)
 	_compact_logs_button.pressed.connect(_on_compact_logs_pressed)
 	_export_saves_button.pressed.connect(_on_export_saves_pressed)
 	_reset_logs_button.pressed.connect(_on_reset_logs_pressed)
+	_open_world_button.pressed.connect(_on_open_world_pressed)
 	_connect_battle_signals()
 	_connect_game_state_signals()
 
@@ -125,6 +135,13 @@ func _process(_delta: float) -> void:
 	_update_labels_from_processor()
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		var key_event: InputEventKey = event as InputEventKey
+		if key_event != null and key_event.pressed and not key_event.echo and key_event.keycode == KEY_F8:
+			_on_open_world_pressed()
+
+
 func _on_toggle_button_pressed() -> void:
 	if _audio_processor == null:
 		_audio_processor = _resolve_audio_processor()
@@ -139,6 +156,12 @@ func _on_toggle_button_pressed() -> void:
 		_audio_processor.call("start_capture")
 	_toggle_button.disabled = false
 	_sync_button_state()
+
+
+func _on_open_world_pressed() -> void:
+	var result: Error = get_tree().change_scene_to_file(EXPLORE_WORLD_SCENE_PATH)
+	if result != OK:
+		push_warning("TestScene: Failed to open explore world scene.")
 
 
 func _on_note_detected(frequency: float, note_name: String, confidence: float) -> void:
@@ -369,6 +392,229 @@ func _on_run_adapter_parity_check_pressed() -> void:
 	var base_dir: String = String(parity.get("base_dir", ""))
 	if not base_dir.is_empty():
 		_log_value_label.append_text("[Save] Adapter parity artifacts:%s\n" % base_dir)
+
+
+func _on_log_sqlite_health_summary_pressed() -> void:
+	if _local_data_manager == null:
+		return
+	if not _local_data_manager.has_method("get_sqlite_health_summary"):
+		_log_value_label.append_text("[SQLiteHealth] LocalDataManager does not expose get_sqlite_health_summary\n")
+		return
+	var summary: Dictionary = _local_data_manager.call("get_sqlite_health_summary") as Dictionary
+	var lines: PackedStringArray = _build_sqlite_health_summary_lines(summary)
+	for line: String in lines:
+		_log_value_label.append_text("%s\n" % line)
+
+
+func _on_run_sqlite_qa_cycle_pressed() -> void:
+	if _local_data_manager == null:
+		return
+	if not _local_data_manager.has_method("run_sqlite_qa_cycle"):
+		_log_value_label.append_text("[Save] SQLite QA cycle API unavailable in LocalDataManager\n")
+		return
+
+	_log_value_label.append_text("[Save] SQLite QA cycle started\n")
+	var cycle: Dictionary = _local_data_manager.call("run_sqlite_qa_cycle") as Dictionary
+	_append_sqlite_qa_cycle_summary(cycle)
+	var gate: Dictionary = {}
+	if _local_data_manager.has_method("validate_sqlite_qa_cycle_result"):
+		gate = _local_data_manager.call("validate_sqlite_qa_cycle_result", cycle) as Dictionary
+		_append_sqlite_qa_gate_result(gate)
+		if _local_data_manager.has_method("persist_sqlite_qa_gate_artifacts"):
+			var artifact_result: Dictionary = _local_data_manager.call("persist_sqlite_qa_gate_artifacts", cycle, gate) as Dictionary
+			_append_sqlite_qa_gate_artifact_result(artifact_result)
+		else:
+			_log_value_label.append_text("[SaveGate] SQLite QA gate artifact API unavailable in LocalDataManager\n")
+	else:
+		_log_value_label.append_text("[SaveGate] SQLite QA gate evaluator unavailable in LocalDataManager\n")
+	var health_after: Dictionary = cycle.get("health_after", {}) as Dictionary
+	var lines: PackedStringArray = _build_sqlite_health_summary_lines(health_after)
+	for line: String in lines:
+		_log_value_label.append_text("%s\n" % line)
+	_refresh_save_stats()
+	_sync_storage_adapter_controls()
+	_append_save_diagnostics_config_line()
+	_log_value_label.append_text("[Save] SQLite QA cycle completed status:%s\n" % String(cycle.get("status", "unknown")))
+
+
+func _build_sqlite_health_summary_lines(summary: Dictionary) -> PackedStringArray:
+	var lines: PackedStringArray = PackedStringArray()
+	lines.append("[SQLiteHealth] ----")
+	if summary == null or summary.is_empty():
+		lines.append("[SQLiteHealth] Summary payload unavailable.")
+		return lines
+
+	var adapter_info: Dictionary = summary.get("adapter", {}) as Dictionary
+	var requested_id: String = String(adapter_info.get("requested_id", "unknown"))
+	var active_id: String = String(adapter_info.get("active_id", "unknown"))
+	var adapter_available: bool = bool(adapter_info.get("available", false))
+	var unavailable_reason: String = String(adapter_info.get("unavailable_reason", ""))
+	lines.append(
+		"[SQLiteHealth] adapter requested:%s active:%s available:%s" % [
+			requested_id,
+			active_id,
+			str(adapter_available)
+		]
+	)
+	if not unavailable_reason.is_empty():
+		lines.append("[SQLiteHealth] adapter unavailable_reason:%s" % unavailable_reason)
+
+	var sqlite_catalog_entry: Dictionary = summary.get("sqlite_catalog", {}) as Dictionary
+	lines.append(
+		"[SQLiteHealth] sqlite_scaffold available:%s reason:%s" % [
+			str(bool(sqlite_catalog_entry.get("available", false))),
+			String(sqlite_catalog_entry.get("reason", ""))
+		]
+	)
+
+	var sqlite_db: Dictionary = summary.get("db", {}) as Dictionary
+	lines.append(
+		"[SQLiteHealth] db exists:%s size_bytes:%d path:%s" % [
+			str(bool(sqlite_db.get("exists", false))),
+			int(sqlite_db.get("size_bytes", 0)),
+			String(sqlite_db.get("absolute_path", ""))
+		]
+	)
+
+	var latest_artifacts: Dictionary = summary.get("latest_artifacts", {}) as Dictionary
+	var latest_parity_dir: String = String(latest_artifacts.get("parity_dir", ""))
+	var latest_snapshot_dir: String = String(latest_artifacts.get("snapshot_dir", ""))
+	lines.append(
+		"[SQLiteHealth] latest parity:%s snapshot:%s" % [
+			latest_parity_dir if not latest_parity_dir.is_empty() else "none",
+			latest_snapshot_dir if not latest_snapshot_dir.is_empty() else "none"
+		]
+	)
+
+	var index_summary: Dictionary = summary.get("readiness_index", {}) as Dictionary
+	var index_abs_path: String = String(summary.get("readiness_index_path", ""))
+	if not bool(index_summary.get("ok", false)):
+		lines.append(
+			"[SQLiteHealth] readiness_index unavailable path:%s reason:%s" % [
+				index_abs_path,
+				String(index_summary.get("reason", "not found"))
+			]
+		)
+		return lines
+
+	lines.append(
+		"[SQLiteHealth] readiness_index status:%s latest_snapshot:%s" % [
+			String(index_summary.get("latest_status", "unknown")),
+			String(index_summary.get("latest_snapshot_name", "unknown"))
+		]
+	)
+	lines.append(
+		"[SQLiteHealth] readiness_index counts(pass:%d warn:%d fail:%d unknown:%d)" % [
+			int(index_summary.get("count_pass", 0)),
+			int(index_summary.get("count_warn", 0)),
+			int(index_summary.get("count_fail", 0)),
+			int(index_summary.get("count_unknown", 0))
+		]
+	)
+	lines.append(
+		"[SQLiteHealth] readiness_index coverage(pass:%s warn:%s fail:%s triplet:%s)" % [
+			str(bool(index_summary.get("has_pass", false))),
+			str(bool(index_summary.get("has_warn", false))),
+			str(bool(index_summary.get("has_fail", false))),
+			str(bool(index_summary.get("has_complete_triplet", false)))
+		]
+	)
+	lines.append("[SQLiteHealth] readiness_index path:%s" % index_abs_path)
+	return lines
+
+
+func _append_sqlite_qa_cycle_summary(cycle: Dictionary) -> void:
+	if cycle == null or cycle.is_empty():
+		_log_value_label.append_text("[Save] SQLite QA cycle result payload is empty\n")
+		return
+
+	var adapter_info: Dictionary = cycle.get("adapter", {}) as Dictionary
+	var parity: Dictionary = cycle.get("parity", {}) as Dictionary
+	var snapshot: Dictionary = cycle.get("snapshot", {}) as Dictionary
+	var readiness_index: Dictionary = cycle.get("readiness_index", {}) as Dictionary
+
+	_log_value_label.append_text(
+		"[Save] SQLite QA result status:%s ok:%s message:%s\n" % [
+			String(cycle.get("status", "unknown")),
+			str(bool(cycle.get("ok", false))),
+			String(cycle.get("message", ""))
+		]
+	)
+	_log_value_label.append_text(
+		"[Save] SQLite QA adapter requested:%s active:%s switch_ok:%s\n" % [
+			String(adapter_info.get("requested_id", "unknown")),
+			String(adapter_info.get("active_id", "unknown")),
+			str(bool(cycle.get("adapter_switch_ok", false)))
+		]
+	)
+	if parity != null and not parity.is_empty():
+		_log_value_label.append_text(
+			"[Save] SQLite QA parity status:%s mismatches:%d\n" % [
+				String(parity.get("status", "unknown")),
+				int(parity.get("mismatch_count", 0))
+			]
+		)
+	var snapshot_ok: bool = bool(snapshot.get("ok", false))
+	if snapshot != null and not snapshot.is_empty():
+		_log_value_label.append_text(
+			"[Save] SQLite QA snapshot ok:%s dir:%s\n" % [
+				str(snapshot_ok),
+				String(snapshot.get("export_dir", ""))
+			]
+		)
+	if readiness_index != null and not readiness_index.is_empty():
+		_log_value_label.append_text(
+			"[Save] SQLite QA readiness status:%s counts(pass:%d warn:%d fail:%d unknown:%d)\n" % [
+				String(readiness_index.get("latest_status", "unknown")),
+				int(readiness_index.get("count_pass", 0)),
+				int(readiness_index.get("count_warn", 0)),
+				int(readiness_index.get("count_fail", 0)),
+				int(readiness_index.get("count_unknown", 0))
+			]
+		)
+
+
+func _append_sqlite_qa_gate_result(gate: Dictionary) -> void:
+	if gate == null or gate.is_empty():
+		_log_value_label.append_text("[SaveGate] SQLite QA gate result payload is empty\n")
+		return
+
+	var gate_ok: bool = bool(gate.get("ok", false))
+	var status_label: String = "PASS" if gate_ok else "FAIL"
+	_log_value_label.append_text(
+		"[SaveGate] SQLite QA Gate %s: %s\n" % [
+			status_label,
+			String(gate.get("summary_message", ""))
+		]
+	)
+
+	var failed_checks: PackedStringArray = _to_string_array(gate.get("failed_checks", PackedStringArray()))
+	for failed_check: String in failed_checks:
+		_log_value_label.append_text("[SaveGate] FAIL %s\n" % failed_check)
+
+	var warnings: PackedStringArray = _to_string_array(gate.get("warnings", PackedStringArray()))
+	for warning: String in warnings:
+		_log_value_label.append_text("[SaveGate] WARN %s\n" % warning)
+
+
+func _append_sqlite_qa_gate_artifact_result(result: Dictionary) -> void:
+	if result == null or result.is_empty():
+		_log_value_label.append_text("[SaveGate] SQLite QA gate artifact result payload is empty\n")
+		return
+
+	_log_value_label.append_text(
+		"[SaveGate] Artifact status:%s ok:%s message:%s\n" % [
+			String(result.get("status", "unknown")),
+			str(bool(result.get("ok", false))),
+			String(result.get("message", ""))
+		]
+	)
+	_log_value_label.append_text(
+		"[SaveGate] Artifact latest:%s\n" % String(result.get("latest_absolute_path", ""))
+	)
+	_log_value_label.append_text(
+		"[SaveGate] Artifact history:%s\n" % String(result.get("history_absolute_path", ""))
+	)
 
 
 func _sync_storage_adapter_controls() -> void:
@@ -715,6 +961,10 @@ func _update_labels_from_processor() -> void:
 	_note_value_label.text = String(_audio_processor.call("get_detected_note"))
 	_confidence_value_label.text = "%.2f" % float(_audio_processor.call("get_detected_confidence"))
 	_input_level_value_label.text = "%.1f dB" % float(_audio_processor.call("get_input_level_db"))
+	if _audio_processor.has_method("get_noise_floor_db"):
+		_noise_floor_value_label.text = "%.1f dB" % float(_audio_processor.call("get_noise_floor_db"))
+	if _audio_processor.has_method("get_effective_min_signal_db"):
+		_effective_threshold_value_label.text = "%.1f dB" % float(_audio_processor.call("get_effective_min_signal_db"))
 	_backend_value_label.text = String(_audio_processor.call("get_backend_mode"))
 	_status_value_label.text = String(_audio_processor.call("get_status_text"))
 	_update_battle_labels()

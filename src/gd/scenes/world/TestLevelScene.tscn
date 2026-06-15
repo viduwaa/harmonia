@@ -1,0 +1,281 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://src/gd/world/TestLevelScene.gd" id="1_r3k2v"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/enemy_encounter_icon.svg" id="2_5vjj1"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/boss_gate_icon.svg" id="3_u41a2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay"]
+bg_color = Color(0.0588235, 0.0862745, 0.129412, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.301961, 0.611765, 0.741176, 0.85)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.24)
+shadow_size = 10
+
+[node name="TestLevelScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_r3k2v")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0470588, 0.0745098, 0.113725, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="WorldPanel" type="PanelContainer" parent="CenterContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(1120, 620)
+
+[node name="WorldRect" type="ColorRect" parent="CenterContainer/WorldPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0862745, 0.133333, 0.196078, 1)
+
+[node name="EncounterZoneA" type="ColorRect" parent="CenterContainer/WorldPanel/WorldRect"]
+unique_name_in_owner = true
+offset_left = 120.0
+offset_top = 120.0
+offset_right = 280.0
+offset_bottom = 280.0
+color = Color(0.14902, 0.321569, 0.388235, 0.9)
+
+[node name="EncounterAIcon" type="TextureRect" parent="CenterContainer/WorldPanel/WorldRect/EncounterZoneA"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_5vjj1")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(0.819608, 0.866667, 1, 0.9)
+
+[node name="EncounterALabel" type="Label" parent="CenterContainer/WorldPanel/WorldRect/EncounterZoneA"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 6.0
+offset_bottom = 32.0
+text = "Encounter A"
+horizontal_alignment = 1
+
+[node name="EncounterZoneB" type="ColorRect" parent="CenterContainer/WorldPanel/WorldRect"]
+unique_name_in_owner = true
+offset_left = 460.0
+offset_top = 90.0
+offset_right = 620.0
+offset_bottom = 250.0
+color = Color(0.14902, 0.321569, 0.388235, 0.9)
+
+[node name="EncounterBIcon" type="TextureRect" parent="CenterContainer/WorldPanel/WorldRect/EncounterZoneB"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_5vjj1")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(0.819608, 0.866667, 1, 0.9)
+
+[node name="EncounterBLabel" type="Label" parent="CenterContainer/WorldPanel/WorldRect/EncounterZoneB"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 6.0
+offset_bottom = 32.0
+text = "Encounter B"
+horizontal_alignment = 1
+
+[node name="EncounterZoneC" type="ColorRect" parent="CenterContainer/WorldPanel/WorldRect"]
+unique_name_in_owner = true
+offset_left = 230.0
+offset_top = 360.0
+offset_right = 390.0
+offset_bottom = 520.0
+color = Color(0.14902, 0.321569, 0.388235, 0.9)
+
+[node name="EncounterCIcon" type="TextureRect" parent="CenterContainer/WorldPanel/WorldRect/EncounterZoneC"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_5vjj1")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(0.819608, 0.866667, 1, 0.9)
+
+[node name="EncounterCLabel" type="Label" parent="CenterContainer/WorldPanel/WorldRect/EncounterZoneC"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 6.0
+offset_bottom = 32.0
+text = "Encounter C"
+horizontal_alignment = 1
+
+[node name="BossGateZone" type="ColorRect" parent="CenterContainer/WorldPanel/WorldRect"]
+unique_name_in_owner = true
+offset_left = 720.0
+offset_top = 320.0
+offset_right = 920.0
+offset_bottom = 520.0
+color = Color(0.270588, 0.176471, 0.0941176, 0.94)
+
+[node name="BossGateIcon" type="TextureRect" parent="CenterContainer/WorldPanel/WorldRect/BossGateZone"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_u41a2")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(0.992157, 0.862745, 0.678431, 0.95)
+
+[node name="BossGateLabel" type="Label" parent="CenterContainer/WorldPanel/WorldRect/BossGateZone"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 6.0
+offset_bottom = 32.0
+text = "Boss Gate"
+horizontal_alignment = 1
+
+[node name="PlayerToken" type="ColorRect" parent="CenterContainer/WorldPanel/WorldRect"]
+unique_name_in_owner = true
+offset_left = 120.0
+offset_top = 120.0
+offset_right = 164.0
+offset_bottom = 164.0
+color = Color(0.34902, 0.72549, 0.956863, 1)
+
+[node name="OverlayPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -360.0
+offset_top = 16.0
+offset_right = 360.0
+offset_bottom = 360.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_overlay")
+
+[node name="OverlayMargin" type="MarginContainer" parent="OverlayPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="OverlayVBox" type="VBoxContainer" parent="OverlayPanel/OverlayMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+layout_mode = 2
+text = "Test Level 01"
+horizontal_alignment = 1
+
+[node name="HintLabel" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+layout_mode = 2
+text = "Clear 1-3 encounters to unlock the boss gate."
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+layout_mode = 2
+text = "Status"
+
+[node name="StatusValue" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Idle"
+autowrap_mode = 3
+
+[node name="BossGateLabel" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+layout_mode = 2
+text = "Boss Gate Wins"
+
+[node name="BossGateValue" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 / 0"
+
+[node name="BossStatusLabel" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+layout_mode = 2
+text = "Boss Status"
+
+[node name="BossStatusValue" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Locked"
+
+[node name="EncounterWinsLabel" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+layout_mode = 2
+text = "Encounter Wins"
+
+[node name="EncounterWinsValue" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0"
+
+[node name="PositionLabel" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+layout_mode = 2
+text = "Position"
+
+[node name="PositionValue" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "(0, 0)"
+
+[node name="LastEncounterLabel" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+layout_mode = 2
+text = "Last Encounter"
+
+[node name="LastEncounterValue" type="Label" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "None"
+autowrap_mode = 3
+
+[node name="ResetLevelButton" type="Button" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Reset Level"
+
+[node name="ReturnToMenuButton" type="Button" parent="OverlayPanel/OverlayMargin/OverlayVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Return to Menu"

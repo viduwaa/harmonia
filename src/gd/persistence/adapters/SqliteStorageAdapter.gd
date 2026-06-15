@@ -241,6 +241,32 @@ func get_file_size_bytes(file_path: String) -> int:
 	return payload_json.to_utf8_buffer().size()
 
 
+func file_exists(file_path: String) -> bool:
+	if not _ensure_open():
+		return _mirror_file_exists(file_path)
+
+	if file_path.ends_with(".jsonl"):
+		var stream_rows: Array = _fetch_rows(
+			"SELECT 1 AS has_row FROM %s WHERE stream_path = %s LIMIT 1;" % [
+				TABLE_JSON_LINES,
+				_sql_quote(file_path)
+			]
+		)
+		if not stream_rows.is_empty():
+			return true
+		return _mirror_file_exists(file_path)
+
+	var document_rows: Array = _fetch_rows(
+		"SELECT path FROM %s WHERE path = %s LIMIT 1;" % [
+			TABLE_DOCUMENTS,
+			_sql_quote(file_path)
+		]
+	)
+	if not document_rows.is_empty():
+		return true
+	return _mirror_file_exists(file_path)
+
+
 func _ensure_open() -> bool:
 	if _sqlite != null:
 		return true
@@ -587,3 +613,11 @@ func _mirror_get_file_size_bytes(file_path: String) -> int:
 	if _json_mirror_adapter == null or not _json_mirror_adapter.has_method("get_file_size_bytes"):
 		return 0
 	return int(_json_mirror_adapter.call("get_file_size_bytes", file_path))
+
+
+func _mirror_file_exists(file_path: String) -> bool:
+	if _json_mirror_adapter == null:
+		return false
+	if _json_mirror_adapter.has_method("file_exists"):
+		return bool(_json_mirror_adapter.call("file_exists", file_path))
+	return FileAccess.file_exists(file_path)

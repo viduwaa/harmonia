@@ -1,0 +1,24 @@
+{
+    "version": 1,
+    "notes": "Placeholder asset contract. Replace files in place to swap art.",
+    "ui": {
+        "icon_placeholder": "res://src/gd/assets/placeholders/ui/icon_placeholder.svg",
+        "panel_placeholder": "res://src/gd/assets/placeholders/ui/panel_placeholder.svg"
+    },
+    "player": {
+        "idle_frames": [
+            "res://src/gd/assets/placeholders/player/player_idle_01.svg",
+            "res://src/gd/assets/placeholders/player/player_idle_02.svg"
+        ],
+        "run_frames": [
+            "res://src/gd/assets/placeholders/player/player_run_01.svg",
+            "res://src/gd/assets/placeholders/player/player_run_02.svg"
+        ],
+        "recommended_frame_size_px": [64, 64]
+    },
+    "tiles": {
+        "atlas": "res://src/gd/assets/placeholders/tiles/tileset_placeholder.svg",
+        "tile_size_px": [32, 32],
+        "atlas_size_px": [256, 256]
+    }
+}

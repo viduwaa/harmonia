@@ -7,6 +7,8 @@ const BATTLE_DEBUG_CONFIG_FILE_PATH: String = "user://save/battle_debug_config.j
 const BATTLE_DEBUG_CONFIG_VERSION: int = 1
 const PROFILE_FILE_PATH: String = "user://save/profile.json"
 const PROFILE_VERSION: int = 1
+const EXPLORE_STATE_FILE_PATH: String = "user://save/explore_state.json"
+const EXPLORE_STATE_VERSION: int = 1
 const LEVEL_PROGRESS_FILE_PATH: String = "user://save/level_progress.json"
 const LEVEL_PROGRESS_VERSION: int = 1
 const NOTE_ATTEMPTS_FILE_PATH: String = "user://save/note_attempts.jsonl"
@@ -15,9 +17,13 @@ const NOTE_ATTEMPT_VERSION: int = 1
 const GAME_SESSION_VERSION: int = 1
 const SAVE_DIAGNOSTICS_FILE_PATH: String = "user://save/save_diagnostics.json"
 const SAVE_DIAGNOSTICS_VERSION: int = 1
+const SQLITE_QA_GATE_LATEST_FILE_PATH: String = "user://save/qa/sqlite_qa_gate_latest.json"
+const SQLITE_QA_GATE_HISTORY_FILE_PATH: String = "user://save/qa/sqlite_qa_gate_history.jsonl"
+const SQLITE_QA_GATE_ARTIFACT_VERSION: int = 1
 const STORAGE_ADAPTER_JSON_ID: String = "json_file"
 const STORAGE_ADAPTER_SQLITE_ID: String = "sqlite_scaffold"
 const STORAGE_ADAPTER_DEFAULT_ID: String = STORAGE_ADAPTER_JSON_ID
+const STORAGE_ADAPTER_STARTUP_DEFAULT_ID: String = STORAGE_ADAPTER_SQLITE_ID
 const STORAGE_ADAPTER_JSON_SCRIPT_PATH: String = "res://src/gd/persistence/adapters/JsonFileStorageAdapter.gd"
 const STORAGE_ADAPTER_SQLITE_SCRIPT_PATH: String = "res://src/gd/persistence/adapters/SqliteStorageAdapter.gd"
 const DEFAULT_MAX_NOTE_ATTEMPT_RECORDS: int = 4000
@@ -43,11 +49,12 @@ var _storage_adapter_requested_id: String = STORAGE_ADAPTER_DEFAULT_ID
 var _storage_adapter_active_id: String = STORAGE_ADAPTER_DEFAULT_ID
 var _storage_adapter_unavailable_reason: String = ""
 var _storage_adapter: RefCounted
+var _has_persisted_storage_adapter_preference: bool = false
 
 
 func _ready() -> void:
-	_configure_storage_adapter(STORAGE_ADAPTER_DEFAULT_ID, false)
 	_load_save_diagnostics_settings()
+	_apply_startup_storage_adapter_rollout()
 	_run_auto_cleanup("startup")
 
 
@@ -179,6 +186,80 @@ func load_profile() -> Dictionary:
 		"last_session_id": String(profile.get("last_session_id", "")),
 		"last_xp_gain": int(profile.get("last_xp_gain", 0)),
 		"last_updated_unix_sec": int(profile.get("last_updated_unix_sec", 0))
+	}
+
+
+func save_explore_state(explore_state: Dictionary) -> bool:
+	if explore_state.is_empty():
+		return false
+	if not _ensure_save_dir():
+		return false
+
+	var payload: Dictionary = {
+		"version": EXPLORE_STATE_VERSION,
+		"explore_state": {
+			"last_spawn_x": float(explore_state.get("last_spawn_x", 0.0)),
+			"last_spawn_y": float(explore_state.get("last_spawn_y", 0.0)),
+			"last_scene": String(explore_state.get("last_scene", "")),
+			"last_checkpoint_id": String(explore_state.get("last_checkpoint_id", "")),
+			"npc_interaction_count": int(explore_state.get("npc_interaction_count", 0)),
+			"relic_interaction_count": int(explore_state.get("relic_interaction_count", 0)),
+			"npc_guide_completed": bool(explore_state.get("npc_guide_completed", false)),
+			"relic_completed": bool(explore_state.get("relic_completed", false)),
+			"resource_shards_total": int(explore_state.get("resource_shards_total", 0)),
+			"last_reward_summary": String(explore_state.get("last_reward_summary", "")),
+			"last_zone_reward_key": String(explore_state.get("last_zone_reward_key", "")),
+			"last_zone_reward_xp": int(explore_state.get("last_zone_reward_xp", 0)),
+			"last_zone_reward_shards": int(explore_state.get("last_zone_reward_shards", 0)),
+			"boss_gate_required_wins": int(explore_state.get("boss_gate_required_wins", 0)),
+			"boss_gate_current_wins": int(explore_state.get("boss_gate_current_wins", 0)),
+			"boss_defeated": bool(explore_state.get("boss_defeated", false)),
+			"shard_sink_small_spends": int(explore_state.get("shard_sink_small_spends", 0)),
+			"shard_sink_large_spends": int(explore_state.get("shard_sink_large_spends", 0)),
+			"shard_sink_total_spends": int(explore_state.get("shard_sink_total_spends", 0)),
+			"shard_sink_total_shards_spent": int(explore_state.get("shard_sink_total_shards_spent", 0)),
+			"shard_sink_total_xp_gained": int(explore_state.get("shard_sink_total_xp_gained", 0)),
+			"shard_sink_last_choice": String(explore_state.get("shard_sink_last_choice", "")),
+			"last_updated_unix_sec": int(explore_state.get("last_updated_unix_sec", 0))
+		}
+	}
+	return _write_json_document(EXPLORE_STATE_FILE_PATH, payload, "explore state")
+
+
+func load_explore_state() -> Dictionary:
+	if not FileAccess.file_exists(EXPLORE_STATE_FILE_PATH):
+		return _default_explore_state()
+	var root: Dictionary = _read_json_document(EXPLORE_STATE_FILE_PATH, "explore state")
+	if root.is_empty():
+		return _default_explore_state()
+	var explore_state: Dictionary = root.get("explore_state", {}) as Dictionary
+	if explore_state.is_empty():
+		return _default_explore_state()
+
+	return {
+		"last_spawn_x": float(explore_state.get("last_spawn_x", 0.0)),
+		"last_spawn_y": float(explore_state.get("last_spawn_y", 0.0)),
+		"last_scene": String(explore_state.get("last_scene", "")),
+		"last_checkpoint_id": String(explore_state.get("last_checkpoint_id", "")),
+		"npc_interaction_count": int(explore_state.get("npc_interaction_count", 0)),
+		"relic_interaction_count": int(explore_state.get("relic_interaction_count", 0)),
+		"npc_guide_completed": bool(explore_state.get("npc_guide_completed", false)),
+		"relic_completed": bool(explore_state.get("relic_completed", false)),
+		"resource_shards_total": int(explore_state.get("resource_shards_total", 0)),
+		"last_reward_summary": String(explore_state.get("last_reward_summary", "")),
+		"last_zone_reward_key": String(explore_state.get("last_zone_reward_key", "")),
+		"last_zone_reward_xp": int(explore_state.get("last_zone_reward_xp", 0)),
+		"last_zone_reward_shards": int(explore_state.get("last_zone_reward_shards", 0)),
+		"boss_gate_required_wins": int(explore_state.get("boss_gate_required_wins", 0)),
+		"boss_gate_current_wins": int(explore_state.get("boss_gate_current_wins", 0)),
+		"boss_defeated": bool(explore_state.get("boss_defeated", false)),
+		"shard_sink_small_spends": int(explore_state.get("shard_sink_small_spends", 0)),
+		"shard_sink_large_spends": int(explore_state.get("shard_sink_large_spends", 0)),
+		"shard_sink_total_spends": int(explore_state.get("shard_sink_total_spends", 0)),
+		"shard_sink_total_shards_spent": int(explore_state.get("shard_sink_total_shards_spent", 0)),
+		"shard_sink_total_xp_gained": int(explore_state.get("shard_sink_total_xp_gained", 0)),
+		"shard_sink_last_choice": String(explore_state.get("shard_sink_last_choice", "")),
+		"last_updated_unix_sec": int(explore_state.get("last_updated_unix_sec", 0))
 	}
 
 
@@ -404,6 +485,283 @@ func get_storage_adapter_catalog() -> Dictionary:
 	return catalog
 
 
+func get_sqlite_health_summary() -> Dictionary:
+	var adapter_info: Dictionary = get_storage_adapter_info()
+	var catalog: Dictionary = get_storage_adapter_catalog()
+	var sqlite_catalog_entry: Dictionary = catalog.get(STORAGE_ADAPTER_SQLITE_ID, {}) as Dictionary
+
+	var sqlite_db_user_path: String = "user://save/harmonia.db"
+	var sqlite_db_abs_path: String = ProjectSettings.globalize_path(sqlite_db_user_path)
+	var sqlite_db_exists: bool = FileAccess.file_exists(sqlite_db_user_path)
+	var sqlite_db_size_bytes: int = _get_raw_file_size_bytes(sqlite_db_user_path)
+
+	var latest_parity_dir: String = _find_latest_child_dir_name("user://save/parity")
+	var latest_snapshot_dir: String = _find_latest_child_dir_name("user://save/exports", "snapshot_")
+
+	var readiness_index_user_path: String = "user://save/exports/migration_readiness_index.json"
+	var readiness_index_abs_path: String = ProjectSettings.globalize_path(readiness_index_user_path)
+	var readiness_index: Dictionary = _read_readiness_index_summary(readiness_index_user_path)
+
+	return {
+		"adapter": adapter_info,
+		"sqlite_catalog": {
+			"available": bool(sqlite_catalog_entry.get("available", false)),
+			"reason": String(sqlite_catalog_entry.get("reason", ""))
+		},
+		"db": {
+			"user_path": sqlite_db_user_path,
+			"absolute_path": sqlite_db_abs_path,
+			"exists": sqlite_db_exists,
+			"size_bytes": sqlite_db_size_bytes
+		},
+		"latest_artifacts": {
+			"parity_dir": latest_parity_dir,
+			"snapshot_dir": latest_snapshot_dir
+		},
+		"readiness_index_path": readiness_index_abs_path,
+		"readiness_index": readiness_index
+	}
+
+
+func run_sqlite_qa_cycle() -> Dictionary:
+	var cycle: Dictionary = {
+		"ok": false,
+		"status": "failed",
+		"message": "",
+		"adapter_switch_ok": false,
+		"adapter": {},
+		"health_before": {},
+		"parity": {},
+		"snapshot": {},
+		"health_after": {},
+		"readiness_index": {}
+	}
+
+	var adapter_switch_ok: bool = set_storage_adapter(STORAGE_ADAPTER_SQLITE_ID, true)
+	var adapter_info: Dictionary = get_storage_adapter_info()
+	cycle["adapter_switch_ok"] = adapter_switch_ok
+	cycle["adapter"] = adapter_info
+
+	var health_before: Dictionary = get_sqlite_health_summary()
+	cycle["health_before"] = health_before
+
+	var active_adapter_id: String = String(adapter_info.get("active_id", ""))
+	if active_adapter_id != STORAGE_ADAPTER_SQLITE_ID:
+		var unavailable_reason: String = String(adapter_info.get("unavailable_reason", ""))
+		if unavailable_reason.is_empty():
+			unavailable_reason = "Unknown reason."
+		cycle["message"] = "Failed to activate sqlite_scaffold adapter: %s" % unavailable_reason
+		cycle["health_after"] = health_before
+		cycle["readiness_index"] = health_before.get("readiness_index", {}) as Dictionary
+		return cycle
+
+	var parity: Dictionary = run_storage_adapter_parity_check()
+	var snapshot: Dictionary = export_save_snapshot()
+	var health_after: Dictionary = get_sqlite_health_summary()
+	var readiness_index: Dictionary = health_after.get("readiness_index", {}) as Dictionary
+
+	cycle["parity"] = parity
+	cycle["snapshot"] = snapshot
+	cycle["health_after"] = health_after
+	cycle["readiness_index"] = readiness_index
+
+	var parity_ok: bool = bool(parity.get("ok", false))
+	var snapshot_ok: bool = bool(snapshot.get("ok", false))
+	var readiness_ok: bool = bool(readiness_index.get("ok", false))
+	var latest_status: String = String(readiness_index.get("latest_status", "unknown"))
+	var cycle_ok: bool = parity_ok and snapshot_ok and readiness_ok and latest_status != "fail"
+
+	cycle["ok"] = cycle_ok
+	cycle["status"] = "passed" if cycle_ok else "failed"
+	cycle["message"] = "SQLite QA cycle completed successfully." if cycle_ok else "SQLite QA cycle completed with one or more failures."
+	return cycle
+
+
+func validate_sqlite_qa_cycle_result(result: Dictionary) -> Dictionary:
+	var failed_checks: PackedStringArray = PackedStringArray()
+	var warnings: PackedStringArray = PackedStringArray()
+
+	if result == null or result.is_empty():
+		failed_checks.append("qa_payload_present: Result payload is empty.")
+		return {
+			"ok": false,
+			"status": "failed",
+			"summary_message": "SQLite QA gate failed: missing result payload.",
+			"failed_checks": failed_checks,
+			"warnings": warnings,
+			"evaluated_unix_sec": int(Time.get_unix_time_from_system()),
+			"check_count": 1,
+			"failed_count": failed_checks.size(),
+			"warning_count": warnings.size()
+		}
+
+	var adapter: Dictionary = result.get("adapter", {}) as Dictionary
+	var parity: Dictionary = result.get("parity", {}) as Dictionary
+	var snapshot: Dictionary = result.get("snapshot", {}) as Dictionary
+	var readiness_index: Dictionary = result.get("readiness_index", {}) as Dictionary
+
+	var active_adapter_id: String = String(adapter.get("active_id", ""))
+	if not bool(result.get("adapter_switch_ok", false)):
+		failed_checks.append("adapter_switch_ok: Adapter switch call returned false.")
+	if active_adapter_id != STORAGE_ADAPTER_SQLITE_ID:
+		failed_checks.append("adapter_active_sqlite: Active adapter is '%s' (expected '%s')." % [active_adapter_id, STORAGE_ADAPTER_SQLITE_ID])
+
+	if not bool(result.get("ok", false)):
+		failed_checks.append("cycle_ok_flag: QA cycle reported ok=false.")
+	if String(result.get("status", "unknown")) != "passed":
+		failed_checks.append("cycle_status: QA cycle status is '%s' (expected 'passed')." % String(result.get("status", "unknown")))
+
+	if not bool(parity.get("ok", false)):
+		failed_checks.append("parity_ok: Parity check failed (status=%s, mismatches=%d)." % [
+			String(parity.get("status", "unknown")),
+			int(parity.get("mismatch_count", 0))
+		])
+
+	if not bool(snapshot.get("ok", false)):
+		failed_checks.append("snapshot_ok: Snapshot export failed (%s)." % String(snapshot.get("message", "unknown error")))
+
+	if not bool(readiness_index.get("ok", false)):
+		failed_checks.append("readiness_index_ok: Readiness index unavailable (%s)." % String(readiness_index.get("reason", "unknown reason")))
+	else:
+		var latest_status: String = String(readiness_index.get("latest_status", "unknown"))
+		if latest_status == "fail":
+			failed_checks.append("readiness_latest_status: latest_status is fail.")
+		elif latest_status == "warn":
+			warnings.append("readiness_latest_status: latest_status is warn.")
+
+	if not bool(readiness_index.get("has_complete_triplet", false)):
+		warnings.append("readiness_triplet_coverage: PASS/WARN/FAIL triplet evidence is incomplete.")
+
+	var gate_ok: bool = failed_checks.is_empty()
+	var summary_message: String = "SQLite QA gate passed." if gate_ok else "SQLite QA gate failed with %d blocking checks." % failed_checks.size()
+
+	return {
+		"ok": gate_ok,
+		"status": "passed" if gate_ok else "failed",
+		"summary_message": summary_message,
+		"failed_checks": failed_checks,
+		"warnings": warnings,
+		"evaluated_unix_sec": int(Time.get_unix_time_from_system()),
+		"check_count": 8,
+		"failed_count": failed_checks.size(),
+		"warning_count": warnings.size()
+	}
+
+
+func persist_sqlite_qa_gate_artifacts(cycle: Dictionary, gate: Dictionary) -> Dictionary:
+	var latest_abs_path: String = ProjectSettings.globalize_path(SQLITE_QA_GATE_LATEST_FILE_PATH)
+	var history_abs_path: String = ProjectSettings.globalize_path(SQLITE_QA_GATE_HISTORY_FILE_PATH)
+
+	if cycle == null or cycle.is_empty():
+		return {
+			"ok": false,
+			"status": "failed",
+			"message": "Cannot persist SQLite QA gate artifact: cycle payload is empty.",
+			"latest_user_path": SQLITE_QA_GATE_LATEST_FILE_PATH,
+			"latest_absolute_path": latest_abs_path,
+			"history_user_path": SQLITE_QA_GATE_HISTORY_FILE_PATH,
+			"history_absolute_path": history_abs_path,
+			"latest_written": false,
+			"history_written": false
+		}
+
+	if gate == null or gate.is_empty():
+		return {
+			"ok": false,
+			"status": "failed",
+			"message": "Cannot persist SQLite QA gate artifact: gate payload is empty.",
+			"latest_user_path": SQLITE_QA_GATE_LATEST_FILE_PATH,
+			"latest_absolute_path": latest_abs_path,
+			"history_user_path": SQLITE_QA_GATE_HISTORY_FILE_PATH,
+			"history_absolute_path": history_abs_path,
+			"latest_written": false,
+			"history_written": false
+		}
+
+	var recorded_unix_sec: int = int(Time.get_unix_time_from_system())
+	var latest_payload: Dictionary = {
+		"schema": "SQLITE_QA_GATE_ARTIFACT",
+		"version": SQLITE_QA_GATE_ARTIFACT_VERSION,
+		"recorded_unix_sec": recorded_unix_sec,
+		"gate": gate.duplicate(true),
+		"cycle": cycle.duplicate(true),
+		"artifact_paths": {
+			"latest_user_path": SQLITE_QA_GATE_LATEST_FILE_PATH,
+			"latest_absolute_path": latest_abs_path,
+			"history_user_path": SQLITE_QA_GATE_HISTORY_FILE_PATH,
+			"history_absolute_path": history_abs_path
+		}
+	}
+
+	var latest_written: bool = _write_json_document(
+		SQLITE_QA_GATE_LATEST_FILE_PATH,
+		latest_payload,
+		"sqlite QA gate latest artifact"
+	)
+	if not latest_written:
+		return {
+			"ok": false,
+			"status": "failed",
+			"message": "Failed to write latest SQLite QA gate artifact JSON.",
+			"latest_user_path": SQLITE_QA_GATE_LATEST_FILE_PATH,
+			"latest_absolute_path": latest_abs_path,
+			"history_user_path": SQLITE_QA_GATE_HISTORY_FILE_PATH,
+			"history_absolute_path": history_abs_path,
+			"latest_written": false,
+			"history_written": false,
+			"recorded_unix_sec": recorded_unix_sec
+		}
+
+	var adapter: Dictionary = cycle.get("adapter", {}) as Dictionary
+	var parity: Dictionary = cycle.get("parity", {}) as Dictionary
+	var snapshot: Dictionary = cycle.get("snapshot", {}) as Dictionary
+	var history_record: Dictionary = {
+		"schema": "SQLITE_QA_GATE_ARTIFACT",
+		"version": SQLITE_QA_GATE_ARTIFACT_VERSION,
+		"recorded_unix_sec": recorded_unix_sec,
+		"gate_ok": bool(gate.get("ok", false)),
+		"gate_status": String(gate.get("status", "unknown")),
+		"summary_message": String(gate.get("summary_message", "")),
+		"failed_checks": _variant_to_string_array(gate.get("failed_checks", PackedStringArray())),
+		"warnings": _variant_to_string_array(gate.get("warnings", PackedStringArray())),
+		"cycle_ok": bool(cycle.get("ok", false)),
+		"cycle_status": String(cycle.get("status", "unknown")),
+		"adapter_active_id": String(adapter.get("active_id", "")),
+		"parity_status": String(parity.get("status", "unknown")),
+		"parity_mismatch_count": int(parity.get("mismatch_count", 0)),
+		"snapshot_ok": bool(snapshot.get("ok", false)),
+		"snapshot_export_dir": String(snapshot.get("export_dir", ""))
+	}
+
+	var history_written: bool = _append_json_line(SQLITE_QA_GATE_HISTORY_FILE_PATH, history_record)
+	if not history_written:
+		return {
+			"ok": false,
+			"status": "failed",
+			"message": "Latest artifact written but failed to append SQLite QA gate history record.",
+			"latest_user_path": SQLITE_QA_GATE_LATEST_FILE_PATH,
+			"latest_absolute_path": latest_abs_path,
+			"history_user_path": SQLITE_QA_GATE_HISTORY_FILE_PATH,
+			"history_absolute_path": history_abs_path,
+			"latest_written": true,
+			"history_written": false,
+			"recorded_unix_sec": recorded_unix_sec
+		}
+
+	return {
+		"ok": true,
+		"status": "written",
+		"message": "SQLite QA gate artifacts persisted.",
+		"latest_user_path": SQLITE_QA_GATE_LATEST_FILE_PATH,
+		"latest_absolute_path": latest_abs_path,
+		"history_user_path": SQLITE_QA_GATE_HISTORY_FILE_PATH,
+		"history_absolute_path": history_abs_path,
+		"latest_written": true,
+		"history_written": true,
+		"recorded_unix_sec": recorded_unix_sec
+	}
+
+
 func run_storage_adapter_parity_check() -> Dictionary:
 	var json_adapter: RefCounted = _create_storage_adapter(STORAGE_ADAPTER_JSON_ID)
 	if json_adapter == null:
@@ -589,6 +947,7 @@ func export_save_snapshot() -> Dictionary:
 		"audio_calibration.json": CALIBRATION_FILE_PATH,
 		"battle_debug_config.json": BATTLE_DEBUG_CONFIG_FILE_PATH,
 		"profile.json": PROFILE_FILE_PATH,
+		"explore_state.json": EXPLORE_STATE_FILE_PATH,
 		"level_progress.json": LEVEL_PROGRESS_FILE_PATH,
 		"save_diagnostics.json": SAVE_DIAGNOSTICS_FILE_PATH,
 		"note_attempts.jsonl": NOTE_ATTEMPTS_FILE_PATH,
@@ -710,7 +1069,7 @@ func _build_migration_readiness(
 	])
 	var missing_required_files: PackedStringArray = PackedStringArray()
 	for required_file_path: String in required_files:
-		if not FileAccess.file_exists(required_file_path):
+		if not _adapter_file_exists(required_file_path):
 			missing_required_files.append(required_file_path.get_file())
 	_append_migration_check(
 		checks,
@@ -1067,33 +1426,33 @@ func _read_snapshot_readiness_entry(snapshot_abs: String) -> Dictionary:
 
 
 func _evaluate_document_contract(file_path: String, payload_key: String) -> Dictionary:
-	if not FileAccess.file_exists(file_path):
+	if _storage_adapter == null:
+		_configure_storage_adapter(STORAGE_ADAPTER_DEFAULT_ID)
+	if _storage_adapter == null or not _storage_adapter.has_method("read_json_document"):
 		return {
 			"ok": false,
-			"detail": "File is missing: %s" % file_path.get_file()
+			"detail": "No readable storage adapter for %s" % file_path.get_file()
 		}
 
-	var file: FileAccess = FileAccess.open(file_path, FileAccess.READ)
-	if file == null:
+	var read_result: Dictionary = _storage_adapter.call("read_json_document", file_path) as Dictionary
+	if read_result == null:
 		return {
 			"ok": false,
-			"detail": "Failed to open file: %s" % file_path.get_file()
+			"detail": "Adapter returned null read result: %s" % file_path.get_file()
+		}
+	if not bool(read_result.get("ok", false)):
+		var read_error: String = String(read_result.get("error", "unknown error"))
+		return {
+			"ok": false,
+			"detail": "Adapter read failed for %s: %s" % [file_path.get_file(), read_error]
 		}
 
-	var raw_text: String = file.get_as_text()
-	var json: JSON = JSON.new()
-	if json.parse(raw_text) != OK:
+	var root: Dictionary = read_result.get("data", {}) as Dictionary
+	if root.is_empty():
 		return {
 			"ok": false,
-			"detail": "JSON parse failed: %s" % file_path.get_file()
+			"detail": "Adapter read returned empty document: %s" % file_path.get_file()
 		}
-	if typeof(json.data) != TYPE_DICTIONARY:
-		return {
-			"ok": false,
-			"detail": "Document root is not a Dictionary: %s" % file_path.get_file()
-		}
-
-	var root: Dictionary = json.data as Dictionary
 	if not root.has("version"):
 		return {
 			"ok": false,
@@ -1137,6 +1496,18 @@ func _append_migration_check(
 		fail_reasons.append("%s: %s" % [check_name, detail])
 	else:
 		warn_reasons.append("%s: %s" % [check_name, detail])
+
+
+func _variant_to_string_array(value: Variant) -> Array:
+	var strings: Array = []
+	if value is PackedStringArray:
+		for item: String in value:
+			strings.append(item)
+		return strings
+	if value is Array:
+		for item_variant: Variant in value:
+			strings.append(String(item_variant))
+	return strings
 
 
 func _append_json_line(file_path: String, payload: Dictionary) -> bool:
@@ -1202,6 +1573,7 @@ func _save_save_diagnostics_settings() -> bool:
 
 
 func _load_save_diagnostics_settings() -> void:
+	_has_persisted_storage_adapter_preference = false
 	if not FileAccess.file_exists(SAVE_DIAGNOSTICS_FILE_PATH):
 		return
 	var root: Dictionary = _read_json_document(SAVE_DIAGNOSTICS_FILE_PATH, "save diagnostics settings")
@@ -1217,10 +1589,45 @@ func _load_save_diagnostics_settings() -> void:
 	_max_record_age_days = max(int(diagnostics.get("max_record_age_days", DEFAULT_MAX_RECORD_AGE_DAYS)), 1)
 	_max_note_attempt_file_mb = max(float(diagnostics.get("max_note_attempt_file_mb", DEFAULT_MAX_NOTE_ATTEMPT_FILE_MB)), 0.1)
 	_max_game_session_file_mb = max(float(diagnostics.get("max_game_session_file_mb", DEFAULT_MAX_GAME_SESSION_FILE_MB)), 0.1)
-	_storage_adapter_requested_id = String(diagnostics.get("storage_adapter_id", STORAGE_ADAPTER_DEFAULT_ID)).strip_edges().to_lower()
-	if _storage_adapter_requested_id.is_empty():
+	var persisted_storage_adapter_id: String = String(diagnostics.get("storage_adapter_id", "")).strip_edges().to_lower()
+	if persisted_storage_adapter_id.is_empty():
 		_storage_adapter_requested_id = STORAGE_ADAPTER_DEFAULT_ID
-	_configure_storage_adapter(_storage_adapter_requested_id, false)
+		return
+	_storage_adapter_requested_id = persisted_storage_adapter_id
+	_has_persisted_storage_adapter_preference = true
+
+
+func _apply_startup_storage_adapter_rollout() -> void:
+	var preferred_adapter_id: String = _storage_adapter_requested_id
+	if not _has_persisted_storage_adapter_preference:
+		preferred_adapter_id = STORAGE_ADAPTER_STARTUP_DEFAULT_ID
+		_storage_adapter_requested_id = preferred_adapter_id
+
+	var configured: bool = _configure_storage_adapter(preferred_adapter_id, false)
+	if configured:
+		if _storage_adapter_active_id == preferred_adapter_id:
+			return
+		var fallback_reason: String = _storage_adapter_unavailable_reason
+		if fallback_reason.is_empty():
+			fallback_reason = "Unknown reason."
+		push_warning(
+			"LocalDataManager: Startup adapter fallback %s -> %s (%s)." % [
+				preferred_adapter_id,
+				_storage_adapter_active_id,
+				fallback_reason
+			]
+		)
+		return
+
+	var failure_reason: String = _storage_adapter_unavailable_reason
+	if failure_reason.is_empty():
+		failure_reason = "Unknown reason."
+	push_warning(
+		"LocalDataManager: Startup adapter configuration failed for '%s' (%s)." % [
+			preferred_adapter_id,
+			failure_reason
+		]
+	)
 
 
 func _run_auto_cleanup(trigger: String) -> Dictionary:
@@ -1322,12 +1729,127 @@ func _enforce_file_size_limit(file_path: String, max_file_mb: float) -> int:
 	return records.size() - keep_count
 
 
+func _get_raw_file_size_bytes(file_path: String) -> int:
+	if not FileAccess.file_exists(file_path):
+		return 0
+	var file: FileAccess = FileAccess.open(file_path, FileAccess.READ)
+	if file == null:
+		return 0
+	return file.get_length()
+
+
+func _find_latest_child_dir_name(parent_user_path: String, required_prefix: String = "") -> String:
+	var dir: DirAccess = DirAccess.open(parent_user_path)
+	if dir == null:
+		return ""
+
+	var latest_name: String = ""
+	dir.list_dir_begin()
+	while true:
+		var entry_name: String = dir.get_next()
+		if entry_name.is_empty():
+			break
+		if entry_name == "." or entry_name == "..":
+			continue
+		if not dir.current_is_dir():
+			continue
+		if not required_prefix.is_empty() and not entry_name.begins_with(required_prefix):
+			continue
+		if latest_name.is_empty() or entry_name > latest_name:
+			latest_name = entry_name
+	dir.list_dir_end()
+	return latest_name
+
+
+func _read_readiness_index_summary(index_user_path: String) -> Dictionary:
+	if not FileAccess.file_exists(index_user_path):
+		return {
+			"ok": false,
+			"reason": "File not found.",
+			"latest_status": "unknown",
+			"latest_snapshot_name": "",
+			"count_pass": 0,
+			"count_warn": 0,
+			"count_fail": 0,
+			"count_unknown": 0,
+			"has_pass": false,
+			"has_warn": false,
+			"has_fail": false,
+			"has_complete_triplet": false
+		}
+
+	var file: FileAccess = FileAccess.open(index_user_path, FileAccess.READ)
+	if file == null:
+		return {
+			"ok": false,
+			"reason": "Failed to open file.",
+			"latest_status": "unknown",
+			"latest_snapshot_name": "",
+			"count_pass": 0,
+			"count_warn": 0,
+			"count_fail": 0,
+			"count_unknown": 0,
+			"has_pass": false,
+			"has_warn": false,
+			"has_fail": false,
+			"has_complete_triplet": false
+		}
+
+	var json_text: String = file.get_as_text()
+	var json: JSON = JSON.new()
+	if json.parse(json_text) != OK or typeof(json.data) != TYPE_DICTIONARY:
+		return {
+			"ok": false,
+			"reason": "JSON parse failed.",
+			"latest_status": "unknown",
+			"latest_snapshot_name": "",
+			"count_pass": 0,
+			"count_warn": 0,
+			"count_fail": 0,
+			"count_unknown": 0,
+			"has_pass": false,
+			"has_warn": false,
+			"has_fail": false,
+			"has_complete_triplet": false
+		}
+
+	var root: Dictionary = json.data as Dictionary
+	var status_counts: Dictionary = root.get("status_counts", {}) as Dictionary
+	var coverage: Dictionary = root.get("coverage", {}) as Dictionary
+	var latest_snapshot_abs: String = String(root.get("latest_snapshot", ""))
+
+	return {
+		"ok": true,
+		"reason": "",
+		"latest_status": String(root.get("latest_status", "unknown")),
+		"latest_snapshot_name": latest_snapshot_abs.get_file(),
+		"count_pass": int(status_counts.get("pass", 0)),
+		"count_warn": int(status_counts.get("warn", 0)),
+		"count_fail": int(status_counts.get("fail", 0)),
+		"count_unknown": int(status_counts.get("unknown", 0)),
+		"has_pass": bool(coverage.get("has_pass", false)),
+		"has_warn": bool(coverage.get("has_warn", false)),
+		"has_fail": bool(coverage.get("has_fail", false)),
+		"has_complete_triplet": bool(coverage.get("has_complete_triplet", false))
+	}
+
+
 func _get_file_size_bytes(file_path: String) -> int:
 	if _storage_adapter == null:
 		_configure_storage_adapter(STORAGE_ADAPTER_DEFAULT_ID)
 	if _storage_adapter == null or not _storage_adapter.has_method("get_file_size_bytes"):
 		return 0
 	return int(_storage_adapter.call("get_file_size_bytes", file_path))
+
+
+func _adapter_file_exists(file_path: String) -> bool:
+	if _storage_adapter == null:
+		_configure_storage_adapter(STORAGE_ADAPTER_DEFAULT_ID)
+	if _storage_adapter == null:
+		return false
+	if _storage_adapter.has_method("file_exists"):
+		return bool(_storage_adapter.call("file_exists", file_path))
+	return FileAccess.file_exists(file_path)
 
 
 func _rewrite_json_line_file(file_path: String, records: Array) -> bool:
@@ -1515,6 +2037,34 @@ func _default_level_progress() -> Dictionary:
 		"max_level_reached": 1,
 		"completed_level_ids": PackedStringArray(),
 		"last_result": "",
+		"last_updated_unix_sec": 0
+	}
+
+
+func _default_explore_state() -> Dictionary:
+	return {
+		"last_spawn_x": 120.0,
+		"last_spawn_y": 120.0,
+		"last_scene": "",
+		"last_checkpoint_id": "",
+		"npc_interaction_count": 0,
+		"relic_interaction_count": 0,
+		"npc_guide_completed": false,
+		"relic_completed": false,
+		"resource_shards_total": 0,
+		"last_reward_summary": "",
+		"last_zone_reward_key": "",
+		"last_zone_reward_xp": 0,
+		"last_zone_reward_shards": 0,
+		"boss_gate_required_wins": 0,
+		"boss_gate_current_wins": 0,
+		"boss_defeated": false,
+		"shard_sink_small_spends": 0,
+		"shard_sink_large_spends": 0,
+		"shard_sink_total_spends": 0,
+		"shard_sink_total_shards_spent": 0,
+		"shard_sink_total_xp_gained": 0,
+		"shard_sink_last_choice": "",
 		"last_updated_unix_sec": 0
 	}
 

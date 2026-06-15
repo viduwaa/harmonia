@@ -1,0 +1,38 @@
+{
+    "version": 1,
+    "basePath": "res://src/gd/assets/ui/icons",
+    "icons": {
+        "flow_header": "flow_header_icon.svg",
+        "flow_action_strip": "flow_action_strip_icon.svg",
+        "hud_live_input": "hud_live_input_icon.svg",
+        "hud_battle_state": "hud_battle_state_icon.svg",
+        "hud_session_summary": "hud_session_summary_icon.svg"
+    },
+    "sceneSlots": [
+        {
+            "scene": "res://src/gd/scenes/player/PlayerFlowScene.tscn",
+            "node": "HeaderIconSlot",
+            "icon": "flow_header"
+        },
+        {
+            "scene": "res://src/gd/scenes/player/PlayerFlowScene.tscn",
+            "node": "ActionStripIconSlot",
+            "icon": "flow_action_strip"
+        },
+        {
+            "scene": "res://src/gd/scenes/player/PlayerHudScene.tscn",
+            "node": "LiveSectionIconSlot",
+            "icon": "hud_live_input"
+        },
+        {
+            "scene": "res://src/gd/scenes/player/PlayerHudScene.tscn",
+            "node": "BattleSectionIconSlot",
+            "icon": "hud_battle_state"
+        },
+        {
+            "scene": "res://src/gd/scenes/player/PlayerHudScene.tscn",
+            "node": "SessionSectionIconSlot",
+            "icon": "hud_session_summary"
+        }
+    ]
+}

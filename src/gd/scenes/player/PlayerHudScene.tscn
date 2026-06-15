@@ -1,0 +1,297 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://src/gd/ui/PlayerHudScene.gd" id="1_fh86r"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/hud_live_input_icon.svg" id="2_j8q3m"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/hud_battle_state_icon.svg" id="3_x4p1n"]
+[ext_resource type="Texture2D" path="res://src/gd/assets/ui/icons/hud_session_summary_icon.svg" id="4_u7t2c"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_card"]
+bg_color = Color(0.0627451, 0.0941176, 0.137255, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.301961, 0.611765, 0.741176, 0.85)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.22)
+shadow_size = 12
+
+[node name="PlayerHudScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_fh86r")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HudCard" type="PanelContainer" parent="CenterContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(560, 760)
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_card")
+
+[node name="CardMargin" type="MarginContainer" parent="CenterContainer/HudCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/HudCard/CardMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+text = "Harmonia Live Pitch HUD"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.917647, 0.964706, 1, 1)
+
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+text = "Player-facing listening diagnostics"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.666667, 0.823529, 0.905882, 1)
+
+[node name="HeaderDivider" type="HSeparator" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+
+[node name="LiveSectionIconSlot" type="TextureRect" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("2_j8q3m")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(0.682353, 0.882353, 0.964706, 0.9)
+
+[node name="LiveSectionTitle" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+text = "Live Input"
+theme_override_colors/font_color = Color(0.552941, 0.85098, 0.964706, 1)
+
+[node name="LiveGrid" type="GridContainer" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 4
+
+[node name="NoteLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+layout_mode = 2
+text = "Current Note"
+
+[node name="NoteValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "--"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="FrequencyLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+layout_mode = 2
+text = "Pitch"
+
+[node name="FrequencyValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "-- Hz"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="ConfidenceLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+layout_mode = 2
+text = "Confidence"
+
+[node name="ConfidenceValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0.00"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="InputLevelLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+layout_mode = 2
+text = "Input Level"
+
+[node name="InputLevelValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "-80.0 dB"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="NoiseFloorLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+layout_mode = 2
+text = "Estimated Noise Floor"
+
+[node name="NoiseFloorValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "-80.0 dB"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="ThresholdLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+layout_mode = 2
+text = "Effective Signal Threshold"
+
+[node name="ThresholdValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "-58.0 dB"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="StatusLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+layout_mode = 2
+text = "Capture Status"
+
+[node name="StatusValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer/LiveGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Idle"
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="BattleDivider" type="HSeparator" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+
+[node name="BattleSectionIconSlot" type="TextureRect" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("3_x4p1n")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(0.968627, 0.811765, 0.560784, 0.95)
+
+[node name="BattleSectionTitle" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+text = "Battle State"
+theme_override_colors/font_color = Color(0.988235, 0.756863, 0.443137, 1)
+
+[node name="TargetPromptLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+text = "Target Note Prompt"
+
+[node name="TargetPromptValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "--"
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="HitFeedbackLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+text = "Hit Feedback"
+
+[node name="HitFeedbackValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Waiting for battle"
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="BattleSummaryLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+text = "Battle Summary"
+
+[node name="BattleSummaryValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Turn 0 | Player HP 100 | Enemy HP 100 | Time 0.0s"
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="SessionDivider" type="HSeparator" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+
+[node name="SessionSectionIconSlot" type="TextureRect" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("4_u7t2c")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(0.694118, 0.921569, 0.576471, 0.95)
+
+[node name="SessionSummaryLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+text = "Session Summary"
+theme_override_colors/font_color = Color(0.670588, 0.917647, 0.517647, 1)
+
+[node name="SessionSummaryValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "XP 0 | Battles 0 (W:0 L:0) | Level L1"
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="ExplorationSummaryLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+text = "Exploration Summary"
+
+[node name="ExplorationSummaryValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Exploration: Shards 0 | No exploration rewards yet."
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="SpendShardsButton" type="Button" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Spend 5 Shards -> +35 XP (Focus)"
+theme_override_colors/font_color = Color(0.0627451, 0.0941176, 0.137255, 1)
+
+[node name="SpendShardsSurgeButton" type="Button" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Spend 12 Shards -> +100 XP (Surge)"
+theme_override_colors/font_color = Color(0.0627451, 0.0941176, 0.137255, 1)
+
+[node name="ShardSinkStatusValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Need 5 shards (0/5)."
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="ShardSinkTelemetryLabel" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+text = "Sink Telemetry"
+
+[node name="ShardSinkTelemetryValue" type="Label" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Sinks: total 0 | focus 0 | surge 0 | spent 0 shards -> 0 XP | last none"
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.92549, 0.960784, 1, 1)
+
+[node name="ControlsDivider" type="HSeparator" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+layout_mode = 2
+
+[node name="ToggleRecordingButton" type="Button" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Start Listening"
+theme_override_colors/font_color = Color(0.0627451, 0.0941176, 0.137255, 1)
+
+[node name="ExploreWorldButton" type="Button" parent="CenterContainer/HudCard/CardMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Enter Explore World (F8)"
+theme_override_colors/font_color = Color(0.0627451, 0.0941176, 0.137255, 1)

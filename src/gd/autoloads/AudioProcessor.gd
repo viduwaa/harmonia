@@ -11,6 +11,8 @@ const MAX_FREQUENCY_HZ: float = 1400.0
 const FREQUENCY_STEP_HZ: float = 5.0
 const DEFAULT_MIN_SIGNAL_DB: float = -58.0
 const DEFAULT_MIN_CONFIDENCE: float = 0.12
+const ADAPTIVE_NOISE_MARGIN_DB: float = 9.0
+const NOISE_FLOOR_SMOOTH_ALPHA: float = 0.08
 const SMOOTHING_ALPHA: float = 0.35
 const ANALYSIS_BUS_VOLUME_DB: float = -60.0
 const CAPTURE_FRAME_COUNT: int = 2048
@@ -49,6 +51,8 @@ var _detected_frequency: float = 0.0
 var _detected_note: String = "--"
 var _detected_confidence: float = 0.0
 var _input_level_db: float = -80.0
+var _noise_floor_db: float = -80.0
+var _effective_min_signal_db: float = DEFAULT_MIN_SIGNAL_DB
 var _status_text: String = "Idle"
 var _last_csharp_skip_reason: String = "C# backend not resolved"
 
@@ -95,6 +99,7 @@ func start_capture() -> void:
 		return
 	if _capture != null:
 		_capture.clear_buffer()
+	_reset_adaptive_noise_floor()
 	_mic_player.play()
 	_is_capturing = true
 	_set_status("Capturing")
@@ -112,6 +117,7 @@ func stop_capture() -> void:
 	_detected_note = "--"
 	_detected_confidence = 0.0
 	_input_level_db = -80.0
+	_reset_adaptive_noise_floor()
 	_set_status("Idle")
 	_log_event("Capture stopped")
 	capture_state_changed.emit(false)
@@ -137,6 +143,14 @@ func get_detected_confidence() -> float:
 
 func get_input_level_db() -> float:
 	return _input_level_db
+
+
+func get_noise_floor_db() -> float:
+	return _noise_floor_db
+
+
+func get_effective_min_signal_db() -> float:
+	return _effective_min_signal_db
 
 
 func get_status_text() -> String:
@@ -190,6 +204,7 @@ func set_min_signal_db(value: float) -> void:
 	if is_equal_approx(_min_signal_db, clamped):
 		return
 	_min_signal_db = clamped
+	_recompute_effective_min_signal_db()
 	_log_event("Threshold updated: min_signal_db=%.1f" % _min_signal_db)
 
 
@@ -441,8 +456,9 @@ func _update_detection() -> void:
 	var raw_frequency: float = float(detection.get("frequency", 0.0))
 	var confidence: float = float(detection.get("confidence", 0.0))
 	_input_level_db = float(detection.get("input_level_db", -80.0))
+	_update_adaptive_noise_floor(raw_frequency, confidence)
 	input_level_changed.emit(_input_level_db)
-	if _input_level_db < _min_signal_db:
+	if _input_level_db < _effective_min_signal_db:
 		_clear_detection("Waiting for louder input")
 		return
 
@@ -492,6 +508,23 @@ func _clear_detection(status: String) -> void:
 
 func _set_status(status: String) -> void:
 	_status_text = status
+
+
+func _reset_adaptive_noise_floor() -> void:
+	_noise_floor_db = -80.0
+	_recompute_effective_min_signal_db()
+
+
+func _update_adaptive_noise_floor(raw_frequency: float, confidence: float) -> void:
+	var likely_noise: bool = raw_frequency <= 0.0 or confidence < _min_confidence
+	if likely_noise:
+		_noise_floor_db = lerp(_noise_floor_db, _input_level_db, NOISE_FLOOR_SMOOTH_ALPHA)
+	_recompute_effective_min_signal_db()
+
+
+func _recompute_effective_min_signal_db() -> void:
+	var adaptive_floor: float = _noise_floor_db + ADAPTIVE_NOISE_MARGIN_DB
+	_effective_min_signal_db = clamp(max(_min_signal_db, adaptive_floor), -80.0, -10.0)
 
 
 func _log_note_capture(source: String, frequency: float, note_name: String, confidence: float) -> void:

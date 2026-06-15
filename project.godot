@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Harmonia"
-run/main_scene="res://src/gd/scenes/debug/TestScene.tscn"
+run/main_scene="res://src/gd/scenes/menu/MainMenuScene.tscn"
 config/features=PackedStringArray("4.6", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -27,6 +27,12 @@ LocalDataManager="*res://src/gd/autoloads/LocalDataManager.gd"
 GameStateManager="*res://src/gd/autoloads/GameStateManager.gd"
 AudioProcessor="*res://src/gd/autoloads/AudioProcessor.gd"
 BattleManager="*res://src/gd/autoloads/BattleManager.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
 
 [dotnet]
 

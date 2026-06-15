@@ -1,0 +1,122 @@
+[gd_scene format=3 uid="uid://c38jculuqb2t5"]
+
+[ext_resource type="Script" uid="uid://c4wigq13b33wa" path="res://src/gd/ui/MainMenuScene.gd" id="1_7v0m1"]
+[ext_resource type="Texture2D" uid="uid://c04wve2dlyj62" path="res://src/gd/assets/ui/icons/menu_logo_icon.svg" id="2_5ptkb"]
+[ext_resource type="Texture2D" uid="uid://bbv6hfrtmsql2" path="res://src/gd/assets/ui/icons/menu_start_icon.svg" id="3_jc4ss"]
+[ext_resource type="Texture2D" uid="uid://b43m0q1y435c2" path="res://src/gd/assets/ui/icons/menu_practice_icon.svg" id="4_2j04v"]
+[ext_resource type="Texture2D" uid="uid://c8qyfo5hma4l" path="res://src/gd/assets/ui/icons/menu_quit_icon.svg" id="5_7nqxf"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_panel"]
+bg_color = Color(0.0588235, 0.0862745, 0.129412, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.301961, 0.611765, 0.741176, 0.85)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.28)
+shadow_size = 12
+
+[node name="MainMenuScene" type="Control" unique_id=324985467]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7v0m1")
+
+[node name="Background" type="ColorRect" parent="." unique_id=29761369]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0470588, 0.0666667, 0.101961, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=439119334]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuPanel" type="PanelContainer" parent="CenterContainer" unique_id=2013864504]
+custom_minimum_size = Vector2(560, 520)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_menu_panel")
+
+[node name="MenuMargin" type="MarginContainer" parent="CenterContainer/MenuPanel" unique_id=966741043]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="MenuVBox" type="VBoxContainer" parent="CenterContainer/MenuPanel/MenuMargin" unique_id=42604623]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Logo" type="TextureRect" parent="CenterContainer/MenuPanel/MenuMargin/MenuVBox" unique_id=1131931495]
+modulate = Color(0.788235, 0.905882, 1, 0.95)
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("2_5ptkb")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/MenuPanel/MenuMargin/MenuVBox" unique_id=2122486993]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.917647, 0.964706, 1, 1)
+text = "Harmonia"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/MenuPanel/MenuMargin/MenuVBox" unique_id=442258500]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.666667, 0.823529, 0.905882, 1)
+text = "Level 01: Explore World"
+horizontal_alignment = 1
+
+[node name="StartTestLevelButton" type="Button" parent="CenterContainer/MenuPanel/MenuMargin/MenuVBox" unique_id=868540365]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Start Level 01"
+icon = ExtResource("3_jc4ss")
+expand_icon = true
+
+[node name="PracticeFlowButton" type="Button" parent="CenterContainer/MenuPanel/MenuMargin/MenuVBox" unique_id=323168047]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Practice Player Flow"
+icon = ExtResource("4_2j04v")
+expand_icon = true
+
+[node name="QuitButton" type="Button" parent="CenterContainer/MenuPanel/MenuMargin/MenuVBox" unique_id=125200785]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.0627451, 0.0941176, 0.137255, 1)
+text = "Quit"
+icon = ExtResource("5_7nqxf")
+expand_icon = true
+
+[node name="DebugToolsButton" type="Button" parent="." unique_id=1394505832]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -56.0
+offset_right = -24.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Open Debug Tools"

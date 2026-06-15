@@ -138,6 +138,10 @@ func get_file_size_bytes(file_path: String) -> int:
 	return file.get_length()
 
 
+func file_exists(file_path: String) -> bool:
+	return FileAccess.file_exists(file_path)
+
+
 func _ensure_parent_dir(file_path: String) -> bool:
 	var parent_dir: String = file_path.get_base_dir()
 	if parent_dir.is_empty():

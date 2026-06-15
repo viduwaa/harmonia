@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="128" viewBox="0 0 256 128">
+  <rect width="256" height="128" fill="#1f2f3e"/>
+  <rect x="8" y="8" width="240" height="112" fill="#32536a" stroke="#a7c6de" stroke-width="4" rx="10" ry="10"/>
+  <text x="128" y="72" font-size="16" text-anchor="middle" fill="#d6ecff" font-family="sans-serif">PANEL</text>
+</svg>
