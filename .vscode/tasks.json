@@ -17,6 +17,23 @@
             },
             "problemMatcher": "$msCompile",
             "group": "build"
+        },
+        {
+            "label": "harmonia-verify-storage-merge-gate",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/scripts/verify-storage-merge-gate.ps1"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "group": "test"
         }
     ]
 }

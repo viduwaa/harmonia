@@ -1,6 +1,6 @@
 # Migration Readiness Evidence
 
-Updated: 2026-04-06
+Updated: 2026-04-20
 
 ## Summary
 
@@ -8,31 +8,47 @@ This note tracks canonical snapshot evidence for migration-readiness states gene
 
 - Index file: C:/Users/Viduwa/AppData/Roaming/Godot/app_userdata/Harmonia/save/exports/migration_readiness_index.json
 - Latest status: pass
+- Latest snapshot: snapshot_20260420_202818
 - Coverage has_pass: true
 - Coverage has_warn: true
 - Coverage has_fail: false
 - Coverage has_complete_triplet: false
+- Latest parity artifact dir: C:/Users/Viduwa/AppData/Roaming/Godot/app_userdata/Harmonia/save/parity/1776697097
+
+## Latest Validation Run (2026-04-20)
+
+- SQLite health summary: executed from TestScene Save Tools.
+- Adapter parity check: refreshed parity artifacts at `.../save/parity/1776697097`.
+- Snapshot export: refreshed with `snapshot_20260420_202818` (latest).
+- Latest diagnostics_report status: pass (9/9 checks).
+
+## SaveGate Artifact Evidence
+
+- Latest gate artifact JSON: C:/Users/Viduwa/AppData/Roaming/Godot/app_userdata/Harmonia/save/qa/sqlite_qa_gate_latest.json
+- Gate history JSONL: C:/Users/Viduwa/AppData/Roaming/Godot/app_userdata/Harmonia/save/qa/sqlite_qa_gate_history.jsonl
+- Latest gate status: passed (`ok=true`) with summary `SQLite QA gate passed.`
+- Gate history entries: 4
 
 ## Waiver Decision
 
-- Decision: FAIL snapshot evidence is waived for this milestone (2026-04-06).
+- Decision: FAIL snapshot evidence is waived-as-pass for this milestone scope (2026-04-20 confirmation).
 - Rationale: controlled FAIL-path logic was validated, but canonical FAIL export artifact capture was intentionally skipped.
 - Accepted risk: migration readiness triplet evidence remains incomplete (has_fail=false, has_complete_triplet=false).
-- Mitigation: keep PASS/WARN artifacts canonical and treat FAIL export capture as follow-up when needed.
+- Mitigation: keep PASS/WARN artifacts canonical; FAIL export capture is optional follow-up only if future release policy changes.
 
 ## Canonical Snapshot Artifacts
 
-- PASS snapshot: snapshot_20260406_105148
+- PASS snapshot: snapshot_20260420_202818
 - WARN snapshot: snapshot_20260406_105108
 - FAIL snapshot: not captured yet
 
 ## Status Counts
 
-- pass: 2
+- pass: 15
 - warn: 3
 - fail: 0
 - unknown: 4
 
 ## Remaining Action
 
-No blocking action for the current milestone. FAIL snapshot capture is deferred by waiver and can be executed later to complete triplet evidence.
+No blocking action for the current milestone. FAIL snapshot capture is intentionally skipped under waiver-as-pass and is only needed if policy changes later.

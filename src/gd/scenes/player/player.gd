@@ -16,36 +16,40 @@ class_name Player
 @export var camera_position_smoothing_enabled: bool = true
 @export var camera_position_smoothing_speed: float = 5.0
 
+const ANIMATION_IDLE: StringName = &"idle"
+const ANIMATION_STATE_IDLE: String = "idle"
+const ANIMATION_STATE_WALK: String = "walk"
+
 # --- Node References ---
 @onready var _animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 var _camera: Camera2D
 
-# Track last movement direction for idle animations (default to down)
+# Track last movement direction for directional walk animations (default to down).
 var _last_direction: String = "down"
+var _current_animation: StringName = &""
 
 
 func _ready() -> void:
 	_setup_camera()
-	_update_animation("idle")
+	_update_animation(ANIMATION_STATE_IDLE)
 
 
 func _physics_process(delta: float) -> void:
-	# Get input vector using standard UI actions
-	var input_vector: Vector2 = Vector2(
-		Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left"),
-		Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
-	)
-	
+	# Prefer the project's movement actions, then allow Godot's built-in UI actions as fallback.
+	var input_vector: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if input_vector == Vector2.ZERO:
+		input_vector = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+
 	if input_vector.length_squared() > 0.0:
 		input_vector = input_vector.normalized()
 		# Accelerate towards max speed in target direction
 		velocity = velocity.move_toward(input_vector * speed, acceleration * delta)
 		_determine_direction(input_vector)
-		_update_animation("walk")
+		_update_animation(ANIMATION_STATE_WALK)
 	else:
 		# Decelerate to stop
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
-		_update_animation("idle")
+		_update_animation(ANIMATION_STATE_IDLE)
 
 	move_and_slide()
 
@@ -87,8 +91,27 @@ func _determine_direction(direction: Vector2) -> void:
 
 ## Updates the AnimatedSprite2D animation state.
 func _update_animation(state: String) -> void:
-	var anim_name: String = "%s_%s" % [state, _last_direction]
-	if _animated_sprite != null and _animated_sprite.sprite_frames.has_animation(anim_name):
-		_animated_sprite.play(anim_name)
-	else:
-		push_warning("Player: Animation not found: %s" % anim_name)
+	if _animated_sprite == null or _animated_sprite.sprite_frames == null:
+		return
+
+	var animation_name: StringName = _resolve_animation_name(state)
+	if animation_name == &"":
+		return
+	if animation_name == _current_animation and _animated_sprite.is_playing():
+		return
+
+	_current_animation = animation_name
+	_animated_sprite.play(animation_name)
+
+
+## Resolves the requested animation against the SpriteFrames resource.
+func _resolve_animation_name(state: String) -> StringName:
+	var directional_animation: StringName = StringName("%s_%s" % [state, _last_direction])
+	if _animated_sprite.sprite_frames.has_animation(directional_animation):
+		return directional_animation
+
+	if state == ANIMATION_STATE_IDLE and _animated_sprite.sprite_frames.has_animation(ANIMATION_IDLE):
+		return ANIMATION_IDLE
+
+	push_warning("Player: Animation not found for state '%s' direction '%s'." % [state, _last_direction])
+	return &""
