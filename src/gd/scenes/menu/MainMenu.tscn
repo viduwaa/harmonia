@@ -1,0 +1,519 @@
+[gd_scene format=3 uid="uid://iinbyurwvye2"]
+
+[ext_resource type="Script" uid="uid://dge628415n6v1" path="res://src/gd/ui/MainMenu.gd" id="1_mainmenu"]
+[ext_resource type="FontFile" uid="uid://c6qm036pbwuuv" path="res://src/gd/assets/ui/fonts/menu_button.ttf" id="2_4iktj"]
+[ext_resource type="Texture2D" uid="uid://bubm5tulcjc77" path="res://src/gd/assets/ui/backgrounds/bg_1.jpeg" id="2_wauda"]
+[ext_resource type="Texture2D" uid="uid://bl6358lugx8cf" path="res://src/gd/assets/ui/menu/firefly_glow.svg" id="3_firefly"]
+[ext_resource type="VideoStream" uid="uid://rutxkhdgrga4" path="res://src/gd/assets/ui/backgrounds/output.ogv" id="3_rv44k"]
+[ext_resource type="FontFile" uid="uid://bylkx38fccjmn" path="res://src/gd/assets/ui/fonts/Daesang Brothers Demo.ttf" id="3_y3hhb"]
+[ext_resource type="Texture2D" uid="uid://dkeshrtvfx0e3" path="res://src/gd/assets/ui/logo.png" id="5_5dgn2"]
+[ext_resource type="Texture2D" uid="uid://popk1itkf5eu" path="res://src/gd/assets/ui/menu/borders/border9.png" id="8_mu75w"]
+[ext_resource type="Texture2D" uid="uid://bgt2gthcupd14" path="res://src/gd/assets/ui/menu/borders/border3.png" id="9_4dy3w"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_fireflies_back"]
+emission_shape = 3
+emission_box_extents = Vector3(620, 300, 1)
+direction = Vector3(0, -1, 0)
+spread = 180.0
+initial_velocity_min = 3.0
+initial_velocity_max = 12.0
+gravity = Vector3(0, -3, 0)
+scale_min = 0.1
+scale_max = 0.28
+color = Color(1, 0.890196, 0.388235, 0.58)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_fireflies_front"]
+emission_shape = 3
+emission_box_extents = Vector3(560, 260, 1)
+direction = Vector3(0, -1, 0)
+spread = 180.0
+initial_velocity_min = 5.0
+initial_velocity_max = 18.0
+gravity = Vector3(0, -5, 0)
+scale_min = 0.16
+scale_max = 0.42
+color = Color(1, 0.94902, 0.541176, 0.82)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_panel"]
+bg_color = Color(0.137255, 0.0941176, 0.266667, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.847059, 0.615686, 0.239216, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
+bg_color = Color(0.847059, 0.596078, 0.188235, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.827451, 0.392157, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_pressed"]
+bg_color = Color(0.658824, 0.407843, 0.145098, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.933333, 0.690196, 0.270588, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_hover"]
+bg_color = Color(0.976471, 0.764706, 0.305882, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.921569, 0.537255, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_disabled"]
+bg_color = Color(0.388235, 0.317647, 0.270588, 0.86)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.552941, 0.447059, 0.329412, 0.8)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_focus"]
+bg_color = Color(1, 0.933333, 0.596078, 0.24)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.933333, 0.596078, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_popup_panel"]
+bg_color = Color(0.0784314, 0.0705882, 0.141176, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.847059, 0.615686, 0.239216, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 10
+
+[node name="MainMenu" type="Control" unique_id=1576727361]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mainmenu")
+
+[node name="BackgroundLayer" type="Control" parent="." unique_id=2094421585]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BackgroundFallback" type="ColorRect" parent="BackgroundLayer" unique_id=1613859890]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ForestBackground" type="TextureRect" parent="BackgroundLayer" unique_id=875061477]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_wauda")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="BackgroundLayer" unique_id=821762077]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stream = ExtResource("3_rv44k")
+volume_db = -25.61
+autoplay = true
+loop = true
+
+[node name="DarkOverlay" type="ColorRect" parent="BackgroundLayer" unique_id=556651289]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0156863, 0.0117647, 0.0392157, 0.42)
+
+[node name="DecorativeLayer" type="Control" parent="." unique_id=369345233]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FireflyParticlesBack" type="GPUParticles2D" parent="DecorativeLayer" unique_id=1258543822]
+position = Vector2(640, 360)
+amount = 52
+texture = ExtResource("3_firefly")
+lifetime = 5.4
+preprocess = 5.4
+speed_scale = 0.45
+randomness = 0.72
+visibility_rect = Rect2(-680, -390, 1360, 780)
+process_material = SubResource("ParticleProcessMaterial_fireflies_back")
+
+[node name="FireflyParticlesFront" type="GPUParticles2D" parent="DecorativeLayer" unique_id=928219500]
+position = Vector2(640, 360)
+amount = 26
+texture = ExtResource("3_firefly")
+lifetime = 4.2
+preprocess = 4.2
+speed_scale = 0.62
+randomness = 0.58
+visibility_rect = Rect2(-680, -390, 1360, 780)
+process_material = SubResource("ParticleProcessMaterial_fireflies_front")
+
+[node name="LeftMusicNote" type="Label" parent="DecorativeLayer" unique_id=795641131]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 352.0
+offset_top = -112.0
+offset_right = 386.0
+offset_bottom = -76.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.819608, 0.345098, 0.92)
+theme_override_font_sizes/font_size = 28
+text = "♪"
+
+[node name="RightMusicNote" type="Label" parent="DecorativeLayer" unique_id=912767806]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 888.0
+offset_top = -118.0
+offset_right = 928.0
+offset_bottom = -80.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.819608, 0.345098, 0.92)
+theme_override_font_sizes/font_size = 28
+text = "♫"
+
+[node name="LeftSparkle" type="Label" parent="DecorativeLayer" unique_id=234738839]
+layout_mode = 1
+offset_left = 380.0
+offset_top = 338.0
+offset_right = 414.0
+offset_bottom = 372.0
+theme_override_colors/font_color = Color(1, 0.92549, 0.556863, 0.9)
+theme_override_font_sizes/font_size = 20
+text = "✦"
+
+[node name="RightSparkle" type="Label" parent="DecorativeLayer" unique_id=2062180115]
+layout_mode = 1
+offset_left = 850.0
+offset_top = 408.0
+offset_right = 884.0
+offset_bottom = 442.0
+theme_override_colors/font_color = Color(1, 0.92549, 0.556863, 0.9)
+theme_override_font_sizes/font_size = 20
+text = "✦"
+
+[node name="MenuSafeArea" type="CenterContainer" parent="." unique_id=657351224]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuFrameRoot" type="Control" parent="MenuSafeArea" unique_id=1441442936]
+layout_mode = 2
+
+[node name="MenuPanel" type="PanelContainer" parent="MenuSafeArea/MenuFrameRoot" unique_id=1509119641]
+custom_minimum_size = Vector2(430, 460)
+layout_mode = 0
+offset_left = -215.0
+offset_top = -283.0
+offset_right = 215.0
+offset_bottom = 283.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_menu_panel")
+
+[node name="MenuMargin" type="MarginContainer" parent="MenuSafeArea/MenuFrameRoot/MenuPanel" unique_id=1665203983]
+layout_mode = 2
+theme_override_constants/margin_left = 26
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 26
+theme_override_constants/margin_bottom = 24
+
+[node name="MenuVBox" type="VBoxContainer" parent="MenuSafeArea/MenuFrameRoot/MenuPanel/MenuMargin" unique_id=302645292]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="MenuSafeArea/MenuFrameRoot/MenuPanel/MenuMargin/MenuVBox" unique_id=1727300148]
+layout_mode = 2
+texture = ExtResource("5_5dgn2")
+expand_mode = 5
+
+[node name="TitleLabel" type="Label" parent="MenuSafeArea/MenuFrameRoot/MenuPanel/MenuMargin/MenuVBox" unique_id=2121460675]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.843137, 0.403922, 1)
+theme_override_colors/font_shadow_color = Color(0.0980392, 0.0431373, 0.117647, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("3_y3hhb")
+theme_override_font_sizes/font_size = 56
+text = "Harmonia"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="MenuSafeArea/MenuFrameRoot/MenuPanel/MenuMargin/MenuVBox" unique_id=1799797277]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.894118, 0.784314, 0.564706, 1)
+theme_override_font_sizes/font_size = 16
+text = "A musical adventure"
+horizontal_alignment = 1
+
+[node name="MenuDivider" type="ColorRect" parent="MenuSafeArea/MenuFrameRoot/MenuPanel/MenuMargin/MenuVBox" unique_id=925476632]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+color = Color(0.847059, 0.615686, 0.239216, 0.75)
+
+[node name="ButtonList" type="VBoxContainer" parent="MenuSafeArea/MenuFrameRoot/MenuPanel/MenuMargin/MenuVBox" unique_id=1882262413]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="NewGameButton" type="Button" parent="MenuSafeArea/MenuFrameRoot/MenuPanel/MenuMargin/MenuVBox/ButtonList" unique_id=127327145]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 38)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_neighbor_bottom = NodePath("../LoadGameButton")
+theme_override_colors/font_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_colors/font_pressed_color = Color(0.0862745, 0.054902, 0.117647, 1)
+theme_override_colors/font_hover_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_fonts/font = ExtResource("2_4iktj")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_focus")
+text = "NEW GAME"
+
+[node name="LoadGameButton" type="Button" parent="MenuSafeArea/MenuFrameRoot/MenuPanel/MenuMargin/MenuVBox/ButtonList" unique_id=2136391616]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 38)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_neighbor_top = NodePath("../NewGameButton")
+focus_neighbor_bottom = NodePath("../OptionsButton")
+theme_override_colors/font_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_colors/font_hover_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_colors/font_disabled_color = Color(0.72549, 0.627451, 0.494118, 0.85)
+theme_override_fonts/font = ExtResource("2_4iktj")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_focus")
+text = "LOAD GAME"
+
+[node name="OptionsButton" type="Button" parent="MenuSafeArea/MenuFrameRoot/MenuPanel/MenuMargin/MenuVBox/ButtonList" unique_id=257415826]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 38)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_neighbor_top = NodePath("../LoadGameButton")
+focus_neighbor_bottom = NodePath("../PracticeModeButton")
+theme_override_colors/font_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_colors/font_hover_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_fonts/font = ExtResource("2_4iktj")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_focus")
+text = "OPTIONS"
+
+[node name="PracticeModeButton" type="Button" parent="MenuSafeArea/MenuFrameRoot/MenuPanel/MenuMargin/MenuVBox/ButtonList" unique_id=924417449]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 38)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_neighbor_top = NodePath("../OptionsButton")
+focus_neighbor_bottom = NodePath("../ExitButton")
+theme_override_colors/font_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_colors/font_hover_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_fonts/font = ExtResource("2_4iktj")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_focus")
+text = "PRACTICE MODE"
+
+[node name="ExitButton" type="Button" parent="MenuSafeArea/MenuFrameRoot/MenuPanel/MenuMargin/MenuVBox/ButtonList" unique_id=2133376236]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 38)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_neighbor_top = NodePath("../PracticeModeButton")
+theme_override_colors/font_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_colors/font_hover_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_fonts/font = ExtResource("2_4iktj")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
+theme_override_styles/focus = SubResource("StyleBoxFlat_focus")
+text = "EXIT"
+
+[node name="FrameTop" type="TextureRect" parent="MenuSafeArea/MenuFrameRoot" unique_id=1002867573]
+layout_mode = 0
+offset_left = -196.00406
+offset_top = -340.0
+offset_right = 196.49606
+offset_bottom = -240.3131
+texture = ExtResource("8_mu75w")
+expand_mode = 1
+
+[node name="FrameLeft" type="TextureRect" parent="MenuSafeArea/MenuFrameRoot" unique_id=138286193]
+layout_mode = 0
+offset_left = -180.00406
+offset_top = -281.0
+offset_right = 383.23593
+offset_bottom = -219.00407
+rotation = 1.5707964
+texture = ExtResource("9_4dy3w")
+expand_mode = 1
+
+[node name="FrameRight" type="TextureRect" parent="MenuSafeArea/MenuFrameRoot" unique_id=1093318732]
+layout_mode = 0
+offset_left = 245.99594
+offset_top = -278.0
+offset_right = 809.23596
+offset_bottom = -216.00407
+rotation = 1.5707964
+texture = ExtResource("9_4dy3w")
+expand_mode = 1
+flip_h = true
+
+[node name="MenuFloatAnimationPlayer" type="AnimationPlayer" parent="." unique_id=774162211]
+unique_name_in_owner = true
+
+[node name="FadeAnimationPlayer" type="AnimationPlayer" parent="." unique_id=1385246343]
+unique_name_in_owner = true
+
+[node name="OptionsPopup" type="PanelContainer" parent="." unique_id=1579599492]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(420, 240)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -120.0
+offset_right = 210.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_popup_panel")
+
+[node name="OptionsMargin" type="MarginContainer" parent="OptionsPopup" unique_id=1519753326]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 20
+
+[node name="OptionsVBox" type="VBoxContainer" parent="OptionsPopup/OptionsMargin" unique_id=2011455439]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="OptionsTitleLabel" type="Label" parent="OptionsPopup/OptionsMargin/OptionsVBox" unique_id=630024296]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.843137, 0.403922, 1)
+theme_override_font_sizes/font_size = 28
+text = "Options"
+horizontal_alignment = 1
+
+[node name="OptionsBodyLabel" type="Label" parent="OptionsPopup/OptionsMargin/OptionsVBox" unique_id=583826760]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.894118, 0.784314, 0.564706, 1)
+theme_override_font_sizes/font_size = 15
+text = "Placeholder panel for audio, display, and accessibility settings. Replace this with the final options UI when ready."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="CloseOptionsButton" type="Button" parent="OptionsPopup/OptionsMargin/OptionsVBox" unique_id=1181846932]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_colors/font_hover_color = Color(0.14902, 0.105882, 0.203922, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_focus")
+text = "CLOSE"

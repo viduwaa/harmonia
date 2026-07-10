@@ -70,8 +70,13 @@ func _ready() -> void:
 	if _audio_processor == null:
 		push_warning("BattleManager: AudioProcessor not found.")
 	else:
-		if not _audio_processor.is_connected("note_detected", _on_note_detected):
+		if _audio_processor.has_signal("note_locked"):
+			if not _audio_processor.is_connected("note_locked", _on_note_detected):
+				_audio_processor.connect("note_locked", _on_note_detected)
+		elif not _audio_processor.is_connected("note_detected", _on_note_detected):
 			_audio_processor.connect("note_detected", _on_note_detected)
+		if _audio_processor.has_signal("note_released") and not _audio_processor.is_connected("note_released", _on_note_released):
+			_audio_processor.connect("note_released", _on_note_released)
 		if not _audio_processor.is_connected("capture_state_changed", _on_capture_state_changed):
 			_audio_processor.connect("capture_state_changed", _on_capture_state_changed)
 
@@ -186,6 +191,10 @@ func _on_capture_state_changed(is_capturing: bool) -> void:
 		start_battle()
 	elif not is_capturing and _battle_active:
 		stop_battle()
+
+
+func _on_note_released(_note_name: String) -> void:
+	_last_detected_note_name = "--"
 
 
 func _on_note_detected(_frequency: float, note_name: String, confidence: float) -> void:

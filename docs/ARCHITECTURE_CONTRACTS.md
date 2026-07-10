@@ -66,7 +66,10 @@ Must not:
 
 ### AudioProcessor
 
-- note_detected(frequency: float, note_name: String, confidence: float)
+- note_detected(frequency: float, note_name: String, confidence: float) — compatibility signal for accepted/locked notes
+- pitch_candidate_changed(frequency: float, note_name: String, confidence: float)
+- note_locked(frequency: float, note_name: String, confidence: float)
+- note_released(note_name: String)
 - capture_state_changed(is_capturing: bool)
 - input_level_changed(level_db: float)
 - backend_mode_changed(mode: String)
@@ -134,7 +137,8 @@ Required keys:
 - Capture uses Record bus effect chain with Spectrum + Capture enabled.
 - Record bus monitor is effectively silenced through analysis volume control.
 - Start/stop cycles restore previous bus state to avoid persistent side effects.
-- Detection emits only after noise-floor and confidence gates.
+- Raw pitch candidates can update continuously for calibration UI.
+- Gameplay note decisions use rolling candidate history, dominant-note voting, note locking, and release grace after noise-floor/confidence gates.
 
 ## Versioning and Compatibility Rules
 

@@ -183,3 +183,17 @@ offset_bottom = 146.0
 grow_horizontal = 0
 text = "Enter Explore World (F8)"
 theme_override_colors/font_color = Color(0.0627451, 0.0941176, 0.137255, 1)
+
+[node name="CalibrateMicrophoneButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -272.0
+offset_top = 156.0
+offset_right = -24.0
+offset_bottom = 194.0
+grow_horizontal = 0
+text = "Mic Setup"
+theme_override_colors/font_color = Color(0.0627451, 0.0941176, 0.137255, 1)

@@ -1,0 +1,557 @@
+[gd_scene format=3 uid="uid://5hqddnqvnx4p"]
+
+[ext_resource type="Script" uid="uid://dtf7mngcreo2v" path="res://src/gd/ui/MicrophoneCalibrationScene.gd" id="1_q8v7k"]
+[ext_resource type="Texture2D" uid="uid://bubm5tulcjc77" path="res://src/gd/assets/ui/backgrounds/bg_1.jpeg" id="2_i5ie4"]
+[ext_resource type="Texture2D" uid="uid://bo5t8gv7sx8xg" path="res://src/gd/assets/ui/icons/hud_live_input_icon.svg" id="2_jm4pu"]
+[ext_resource type="FontFile" uid="uid://hmqxcjyc1jhw" path="res://src/gd/assets/ui/fonts/PixeloidSans.ttf" id="3_vuruu"]
+[ext_resource type="Texture2D" uid="uid://cflikui0nnb8w" path="res://src/gd/assets/ui/menu/borders/border5.png" id="5_t1ll3"]
+[ext_resource type="Texture2D" uid="uid://dkeshrtvfx0e3" path="res://src/gd/assets/ui/logo.png" id="5_uxna6"]
+[ext_resource type="Texture2D" uid="uid://c8vld5snv457d" path="res://src/gd/assets/ui/menu/borders/border8.png" id="6_jtlko"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_calibration_card"]
+bg_color = Color(0.055, 0.062, 0.13, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.98, 0.67, 0.2, 0.9)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.38)
+shadow_size = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inner_panel"]
+bg_color = Color(0.09, 0.105, 0.2, 0.82)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.47, 0.62, 0.82, 0.45)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_meter_panel"]
+bg_color = Color(0.018, 0.021, 0.035, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.49, 0.17, 0.78)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="MicrophoneCalibrationScene" type="Control" unique_id=577773526]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_q8v7k")
+
+[node name="Background" type="ColorRect" parent="." unique_id=282365189]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.025, 0.027, 0.049, 1)
+
+[node name="BG Image" type="TextureRect" parent="." unique_id=1159690526]
+layout_mode = 0
+offset_right = 1376.0
+offset_bottom = 768.0
+texture = ExtResource("2_i5ie4")
+
+[node name="BackdropGlow" type="ColorRect" parent="." unique_id=818345011]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.07, 0.16, 0.44)
+
+[node name="SafeArea" type="MarginContainer" parent="." unique_id=744979338]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="CenterContainer" type="CenterContainer" parent="SafeArea" unique_id=298528123]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control" type="Control" parent="SafeArea/CenterContainer" unique_id=193697411]
+layout_mode = 2
+
+[node name="CalibrationCard" type="PanelContainer" parent="SafeArea/CenterContainer/Control" unique_id=1383771780]
+clip_contents = true
+custom_minimum_size = Vector2(680, 430)
+layout_mode = 0
+offset_left = -343.0
+offset_top = -267.0
+offset_right = 343.0
+offset_bottom = 266.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_calibration_card")
+
+[node name="CardMargin" type="MarginContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard" unique_id=303281854]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 16
+
+[node name="CardStack" type="VBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin" unique_id=1650282729]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="HeaderRow" type="HBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack" unique_id=272127100]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MicIcon" type="TextureRect" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/HeaderRow" unique_id=965428759]
+modulate = Color(1, 0.83, 0.45, 0.95)
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("2_jm4pu")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HeaderTextStack" type="VBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/HeaderRow" unique_id=258721633]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="TitleLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/HeaderRow/HeaderTextStack" unique_id=429133958]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.74, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Microphone Calibration"
+
+[node name="InstructionLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/HeaderRow/HeaderTextStack" unique_id=858694267]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.83, 0.88, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Choose your mic, test a steady pitch, then save."
+autowrap_mode = 3
+
+[node name="DevicePanel" type="PanelContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack" unique_id=1686830086]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
+
+[node name="DeviceMargin" type="MarginContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/DevicePanel" unique_id=1800614475]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 7
+
+[node name="DeviceRow" type="HBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/DevicePanel/DeviceMargin" unique_id=560883726]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DeviceLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/DevicePanel/DeviceMargin/DeviceRow" unique_id=1951717081]
+custom_minimum_size = Vector2(86, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Input"
+vertical_alignment = 1
+
+[node name="InputDeviceSelector" type="OptionButton" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/DevicePanel/DeviceMargin/DeviceRow" unique_id=55683059]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RefreshDevicesButton" type="Button" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/DevicePanel/DeviceMargin/DeviceRow" unique_id=1414417539]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Refresh"
+
+[node name="MeterPanel" type="PanelContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack" unique_id=532486494]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_meter_panel")
+
+[node name="MeterMargin" type="MarginContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/MeterPanel" unique_id=649230184]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="MeterStack" type="VBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/MeterPanel/MeterMargin" unique_id=769157650]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="LevelBars" type="HBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/MeterPanel/MeterMargin/MeterStack" unique_id=944004840]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_constants/separation = 3
+alignment = 1
+
+[node name="MeterHint" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/MeterPanel/MeterMargin/MeterStack" unique_id=2042914781]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.74, 0.45, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Aim for green/yellow. Avoid red clipping."
+horizontal_alignment = 1
+
+[node name="PitchPanel" type="PanelContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack" unique_id=1756048701]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
+
+[node name="PitchMargin" type="MarginContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/PitchPanel" unique_id=995053221]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="PitchRow" type="HBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/PitchPanel/PitchMargin" unique_id=1650863303]
+layout_mode = 2
+
+[node name="PitchLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/PitchPanel/PitchMargin/PitchRow" unique_id=1260259366]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Current Pitch"
+
+[node name="PitchValue" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/PitchPanel/PitchMargin/PitchRow" unique_id=1912383074]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.44, 1, 0.47, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "--"
+horizontal_alignment = 2
+
+[node name="InfoControlsRow" type="HBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack" unique_id=84830997]
+custom_minimum_size = Vector2(0, 132)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DiagnosticsPanel" type="PanelContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow" unique_id=718619049]
+custom_minimum_size = Vector2(320, 132)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
+
+[node name="DiagnosticsMargin" type="MarginContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel" unique_id=1253220643]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 7
+
+[node name="DiagnosticsStack" type="VBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin" unique_id=1894174623]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="DiagnosticsTitle" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack" unique_id=454935932]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.74, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Status"
+
+[node name="DiagnosticsGrid" type="GridContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack" unique_id=546975868]
+layout_mode = 2
+columns = 2
+
+[node name="FrequencyLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=949062330]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Hz"
+
+[node name="FrequencyValue" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=1602739197]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "-- Hz"
+
+[node name="ConfidenceLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=677973622]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Confidence"
+
+[node name="ConfidenceValue" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=1312381002]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "--"
+
+[node name="InputLevelLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=865221907]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Level"
+
+[node name="InputLevelValue" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=1176379331]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "-- dB"
+
+[node name="NoiseFloorLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=124584899]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Noise"
+
+[node name="NoiseFloorValue" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=1784010432]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "-- dB"
+
+[node name="ThresholdLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=346605896]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Threshold"
+
+[node name="ThresholdValue" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=1253833310]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "-- dB"
+
+[node name="BackendLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=555501742]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Backend"
+
+[node name="BackendValue" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=45891750]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "--"
+
+[node name="StatusLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=1368706644]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "State"
+
+[node name="StatusValue" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/DiagnosticsPanel/DiagnosticsMargin/DiagnosticsStack/DiagnosticsGrid" unique_id=1163426844]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.93, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Idle"
+clip_text = true
+
+[node name="AdvancedPanel" type="PanelContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow" unique_id=1830682121]
+custom_minimum_size = Vector2(320, 132)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
+
+[node name="AdvancedMargin" type="MarginContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel" unique_id=68118588]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 7
+
+[node name="AdvancedStack" type="VBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin" unique_id=833246633]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="AdvancedTitle" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack" unique_id=961316997]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.74, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Tuning"
+
+[node name="MinSignalRow" type="HBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack" unique_id=252572033]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="MinSignalLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack/MinSignalRow" unique_id=1918204808]
+custom_minimum_size = Vector2(86, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.91, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Threshold"
+
+[node name="MinSignalSlider" type="HSlider" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack/MinSignalRow" unique_id=136688144]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -80.0
+max_value = -20.0
+value = -58.0
+
+[node name="MinSignalValue" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack/MinSignalRow" unique_id=751639153]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "-58 dB"
+horizontal_alignment = 2
+
+[node name="MinConfidenceRow" type="HBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack" unique_id=946310075]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="MinConfidenceLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack/MinConfidenceRow" unique_id=385447100]
+custom_minimum_size = Vector2(86, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.91, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Confidence"
+
+[node name="MinConfidenceSlider" type="HSlider" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack/MinConfidenceRow" unique_id=833981093]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 0.12
+
+[node name="MinConfidenceValue" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack/MinConfidenceRow" unique_id=857753715]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "0.12"
+horizontal_alignment = 2
+
+[node name="StableFramesRow" type="HBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack" unique_id=1979960367]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="StableFramesLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack/StableFramesRow" unique_id=979087427]
+custom_minimum_size = Vector2(86, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.91, 1, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Stable"
+
+[node name="StableFramesSpinBox" type="SpinBox" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/InfoControlsRow/AdvancedPanel/AdvancedMargin/AdvancedStack/StableFramesRow" unique_id=1515720996]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 12.0
+value = 3.0
+
+[node name="GuidanceLabel" type="Label" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack" unique_id=325078794]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.86, 0.52, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Press Test Mic, then sing or hum a steady comfortable note."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+clip_text = true
+
+[node name="FooterRow" type="HBoxContainer" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack" unique_id=337125312]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TestMicButton" type="Button" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/FooterRow" unique_id=1888954499]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Test Mic"
+
+[node name="SaveContinueButton" type="Button" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/FooterRow" unique_id=177629935]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.89474344, 0.8840525, 0.10513463, 1)
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Save & Continue"
+
+[node name="ResetDefaultsButton" type="Button" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/FooterRow" unique_id=1743732457]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Reset Defaults"
+
+[node name="BackButton" type="Button" parent="SafeArea/CenterContainer/Control/CalibrationCard/CardMargin/CardStack/FooterRow" unique_id=710490192]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_vuruu")
+text = "Back"
+
+[node name="TextureRect" type="TextureRect" parent="SafeArea/CenterContainer/Control" unique_id=1505140241]
+layout_mode = 0
+offset_left = -340.0
+offset_top = -322.0
+offset_right = 192.95526
+offset_bottom = -270.0233
+texture = ExtResource("5_t1ll3")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="SafeArea/CenterContainer/Control" unique_id=210690912]
+layout_mode = 0
+offset_left = -308.0
+offset_top = -264.0
+offset_right = 203.75214
+offset_bottom = -197.67574
+rotation = 1.5707964
+texture = ExtResource("6_jtlko")
+expand_mode = 1
+
+[node name="TextureRect4" type="TextureRect" parent="SafeArea/CenterContainer/Control" unique_id=613698148]
+layout_mode = 0
+offset_left = 406.0
+offset_top = -267.0
+offset_right = 917.75214
+offset_bottom = -200.67574
+rotation = 1.5707964
+texture = ExtResource("6_jtlko")
+expand_mode = 1
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=367906181]
+layout_mode = 0
+offset_left = 800.0
+offset_top = 24.0
+offset_right = 1017.5
+offset_bottom = 169.0
+texture = ExtResource("5_uxna6")
+expand_mode = 1

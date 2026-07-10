@@ -1,6 +1,9 @@
 extends Node
 
 signal note_detected(frequency: float, note_name: String, confidence: float)
+signal pitch_candidate_changed(frequency: float, note_name: String, confidence: float)
+signal note_locked(frequency: float, note_name: String, confidence: float)
+signal note_released(note_name: String)
 signal capture_state_changed(is_capturing: bool)
 signal input_level_changed(level_db: float)
 signal backend_mode_changed(mode: String)
@@ -14,6 +17,10 @@ const DEFAULT_MIN_CONFIDENCE: float = 0.12
 const ADAPTIVE_NOISE_MARGIN_DB: float = 9.0
 const NOISE_FLOOR_SMOOTH_ALPHA: float = 0.08
 const SMOOTHING_ALPHA: float = 0.35
+const NOTE_HISTORY_WINDOW_SEC: float = 0.22
+const NOTE_LOCK_MIN_RATIO: float = 0.65
+const NOTE_SWITCH_MIN_SEC: float = 0.18
+const NOTE_RELEASE_GRACE_SEC: float = 0.20
 const ANALYSIS_BUS_VOLUME_DB: float = -60.0
 const CAPTURE_FRAME_COUNT: int = 2048
 const CSHARP_PITCH_CLASS_NAME: String = "PitchDecisionService"
@@ -43,6 +50,12 @@ var _min_signal_db: float = DEFAULT_MIN_SIGNAL_DB
 var _min_confidence: float = DEFAULT_MIN_CONFIDENCE
 var _candidate_note: String = ""
 var _stable_frame_count: int = 0
+var _candidate_history: Array[Dictionary] = []
+var _candidate_switch_elapsed_sec: float = 0.0
+var _invalid_input_elapsed_sec: float = 0.0
+var _locked_note: String = "--"
+var _locked_frequency: float = 0.0
+var _locked_confidence: float = 0.0
 var _pitch_service: Object
 var _backend_mode: String = "GDScript"
 var _backend_retry_elapsed: float = 0.0
@@ -65,9 +78,9 @@ func _ready() -> void:
 	_resolve_pitch_backend()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _pitch_service == null:
-		_backend_retry_elapsed += _delta
+		_backend_retry_elapsed += delta
 		if _backend_retry_elapsed >= BACKEND_RETRY_INTERVAL_SEC:
 			_backend_retry_elapsed = 0.0
 			_resolve_pitch_backend()
@@ -78,7 +91,7 @@ func _process(_delta: float) -> void:
 		_resolve_audio_effect_instances()
 		if _spectrum == null:
 			return
-	_update_detection()
+	_update_detection(delta)
 
 
 func start_capture() -> void:
@@ -100,6 +113,7 @@ func start_capture() -> void:
 	if _capture != null:
 		_capture.clear_buffer()
 	_reset_adaptive_noise_floor()
+	_reset_note_decision_state()
 	_mic_player.play()
 	_is_capturing = true
 	_set_status("Capturing")
@@ -118,10 +132,13 @@ func stop_capture() -> void:
 	_detected_confidence = 0.0
 	_input_level_db = -80.0
 	_reset_adaptive_noise_floor()
+	_reset_note_decision_state()
 	_set_status("Idle")
 	_log_event("Capture stopped")
 	capture_state_changed.emit(false)
+	note_released.emit("--")
 	note_detected.emit(_detected_frequency, _detected_note, _detected_confidence)
+	pitch_candidate_changed.emit(0.0, "--", 0.0)
 	input_level_changed.emit(_input_level_db)
 
 
@@ -444,7 +461,7 @@ func _analyze_spectrum_bins() -> Dictionary:
 	}
 
 
-func _update_detection() -> void:
+func _update_detection(delta: float) -> void:
 	var detection: Dictionary = _try_csharp_yin_detection()
 	if not bool(detection.get("valid", false)):
 		_last_csharp_skip_reason = String(detection.get("reason", "YIN fallback"))
@@ -458,52 +475,216 @@ func _update_detection() -> void:
 	_input_level_db = float(detection.get("input_level_db", -80.0))
 	_update_adaptive_noise_floor(raw_frequency, confidence)
 	input_level_changed.emit(_input_level_db)
+
 	if _input_level_db < _effective_min_signal_db:
-		_clear_detection("Waiting for louder input")
+		_handle_invalid_note_input(delta, "Waiting for louder input")
 		return
 
 	if confidence < _min_confidence or raw_frequency <= 0.0:
-		_clear_detection("Input detected but not stable")
+		_handle_invalid_note_input(delta, "Input detected but not stable")
 		return
 
-	var next_frequency: float = raw_frequency if _detected_frequency <= 0.0 else lerp(_detected_frequency, raw_frequency, SMOOTHING_ALPHA)
-	var next_note: String = convert_hz_to_note(next_frequency)
-	if next_note != _candidate_note:
-		_candidate_note = next_note
-		_stable_frame_count = 1
-	else:
-		_stable_frame_count += 1
-
-	if _stable_frame_count < _stable_frames_required:
-		_detected_frequency = next_frequency
-		_detected_note = "--"
-		_detected_confidence = confidence
-		_set_status("Stabilizing note (%d/%d)" % [_stable_frame_count, _stable_frames_required])
-		note_detected.emit(0.0, "--", confidence)
-		return
-
-	var previous_note: String = _detected_note
-	_detected_frequency = next_frequency
-	_detected_note = next_note
-	_detected_confidence = confidence
+	_invalid_input_elapsed_sec = 0.0
 	var source: String = String(detection.get("source", _backend_mode))
-	if previous_note != next_note:
-		_log_note_capture(source, next_frequency, next_note, confidence)
-	if source == "GDScriptFFT" and String(detection.get("fallback_reason", "")) != "":
-		_set_status("Capturing (%s: %s)" % [source, String(detection.get("fallback_reason", ""))])
+	var candidate_frequency: float = raw_frequency if _locked_frequency <= 0.0 else lerp(_locked_frequency, raw_frequency, SMOOTHING_ALPHA)
+	var candidate_note: String = convert_hz_to_note(raw_frequency)
+	pitch_candidate_changed.emit(raw_frequency, candidate_note, confidence)
+	_add_candidate_sample(candidate_note, raw_frequency, confidence, delta)
+
+	var dominant: Dictionary = _get_dominant_candidate()
+	var dominant_note: String = String(dominant.get("note", "--"))
+	var dominant_count: int = int(dominant.get("count", 0))
+	var dominant_frequency: float = float(dominant.get("frequency", candidate_frequency))
+	var dominant_confidence: float = float(dominant.get("confidence", confidence))
+	var required_count: int = _get_required_candidate_count()
+
+	if dominant_note == "--" or dominant_count < required_count:
+		_stable_frame_count = dominant_count
+		_set_status("Stabilizing note (%d/%d)" % [dominant_count, required_count])
+		_emit_current_locked_note()
+		return
+
+	_stable_frame_count = dominant_count
+	if _locked_note == "--":
+		_lock_note(dominant_note, dominant_frequency, dominant_confidence, source, detection)
+		return
+
+	if dominant_note == _locked_note:
+		_candidate_note = dominant_note
+		_candidate_switch_elapsed_sec = 0.0
+		_update_locked_note(dominant_frequency, dominant_confidence, source, detection)
+		return
+
+	if dominant_note != _candidate_note:
+		_candidate_note = dominant_note
+		_candidate_switch_elapsed_sec = 0.0
 	else:
-		_set_status("Capturing (%s)" % source)
-	note_detected.emit(_detected_frequency, _detected_note, _detected_confidence)
+		_candidate_switch_elapsed_sec += delta
+
+	if _candidate_switch_elapsed_sec < NOTE_SWITCH_MIN_SEC:
+		_set_status("Holding %s; testing %s" % [_locked_note, dominant_note])
+		_emit_current_locked_note()
+		return
+
+	_lock_note(dominant_note, dominant_frequency, dominant_confidence, source, detection)
+
+
+func _handle_invalid_note_input(delta: float, status: String) -> void:
+	_candidate_history.clear()
+	_candidate_note = ""
+	_stable_frame_count = 0
+	_candidate_switch_elapsed_sec = 0.0
+	pitch_candidate_changed.emit(0.0, "--", 0.0)
+	_invalid_input_elapsed_sec += delta
+	_set_status(status)
+	if _locked_note != "--" and _invalid_input_elapsed_sec >= NOTE_RELEASE_GRACE_SEC:
+		_release_locked_note(_locked_note)
+	elif _locked_note == "--":
+		_detected_frequency = 0.0
+		_detected_note = "--"
+		_detected_confidence = 0.0
+		note_detected.emit(_detected_frequency, _detected_note, _detected_confidence)
 
 
 func _clear_detection(status: String) -> void:
+	_reset_note_decision_state()
+	_set_status(status)
+	note_detected.emit(_detected_frequency, _detected_note, _detected_confidence)
+	pitch_candidate_changed.emit(0.0, "--", 0.0)
+
+
+func _reset_note_decision_state() -> void:
+	_candidate_note = ""
+	_stable_frame_count = 0
+	_candidate_history.clear()
+	_candidate_switch_elapsed_sec = 0.0
+	_invalid_input_elapsed_sec = 0.0
+	_locked_note = "--"
+	_locked_frequency = 0.0
+	_locked_confidence = 0.0
 	_detected_frequency = 0.0
 	_detected_note = "--"
 	_detected_confidence = 0.0
-	_candidate_note = ""
-	_stable_frame_count = 0
-	_set_status(status)
+
+
+func _add_candidate_sample(note_name: String, frequency: float, confidence: float, delta: float) -> void:
+	for sample: Dictionary in _candidate_history:
+		sample["age"] = float(sample.get("age", 0.0)) + delta
+	_candidate_history.append({
+		"note": note_name,
+		"frequency": frequency,
+		"confidence": confidence,
+		"age": 0.0
+	})
+	var retained: Array[Dictionary] = []
+	for sample: Dictionary in _candidate_history:
+		if float(sample.get("age", 0.0)) <= NOTE_HISTORY_WINDOW_SEC:
+			retained.append(sample)
+	_candidate_history = retained
+
+
+func _get_dominant_candidate() -> Dictionary:
+	if _candidate_history.is_empty():
+		return {"note": "--", "count": 0, "frequency": 0.0, "confidence": 0.0}
+
+	var stats: Dictionary = {}
+	for sample: Dictionary in _candidate_history:
+		var note_name: String = String(sample.get("note", "--"))
+		if note_name == "--":
+			continue
+		if not stats.has(note_name):
+			stats[note_name] = {
+				"count": 0,
+				"frequency_sum": 0.0,
+				"confidence_sum": 0.0
+			}
+		var note_stats: Dictionary = stats[note_name] as Dictionary
+		note_stats["count"] = int(note_stats.get("count", 0)) + 1
+		note_stats["frequency_sum"] = float(note_stats.get("frequency_sum", 0.0)) + float(sample.get("frequency", 0.0))
+		note_stats["confidence_sum"] = float(note_stats.get("confidence_sum", 0.0)) + float(sample.get("confidence", 0.0))
+
+	var best_note: String = "--"
+	var best_count: int = 0
+	var best_frequency: float = 0.0
+	var best_confidence: float = 0.0
+	for note_name: String in stats.keys():
+		var note_stats: Dictionary = stats[note_name] as Dictionary
+		var count: int = int(note_stats.get("count", 0))
+		if count > best_count:
+			best_note = note_name
+			best_count = count
+			best_frequency = float(note_stats.get("frequency_sum", 0.0)) / float(max(count, 1))
+			best_confidence = float(note_stats.get("confidence_sum", 0.0)) / float(max(count, 1))
+
+	return {
+		"note": best_note,
+		"count": best_count,
+		"frequency": best_frequency,
+		"confidence": best_confidence
+	}
+
+
+func _get_required_candidate_count() -> int:
+	var history_count: int = max(_candidate_history.size(), 1)
+	var ratio_count: int = int(ceil(float(history_count) * NOTE_LOCK_MIN_RATIO))
+	return max(_stable_frames_required, ratio_count)
+
+
+func _lock_note(note_name: String, frequency: float, confidence: float, source: String, detection: Dictionary) -> void:
+	var previous_note: String = _locked_note
+	_locked_note = note_name
+	_locked_frequency = frequency
+	_locked_confidence = confidence
+	_detected_frequency = frequency
+	_detected_note = note_name
+	_detected_confidence = confidence
+	_candidate_note = note_name
+	_candidate_switch_elapsed_sec = 0.0
+	if previous_note != note_name:
+		_log_note_capture(source, frequency, note_name, confidence)
+	_apply_capture_status(source, detection)
+	note_locked.emit(_detected_frequency, _detected_note, _detected_confidence)
 	note_detected.emit(_detected_frequency, _detected_note, _detected_confidence)
+
+
+func _update_locked_note(frequency: float, confidence: float, source: String, detection: Dictionary) -> void:
+	_locked_frequency = lerp(_locked_frequency, frequency, SMOOTHING_ALPHA) if _locked_frequency > 0.0 else frequency
+	_locked_confidence = confidence
+	_detected_frequency = _locked_frequency
+	_detected_note = _locked_note
+	_detected_confidence = _locked_confidence
+	_apply_capture_status(source, detection)
+	note_detected.emit(_detected_frequency, _detected_note, _detected_confidence)
+
+
+func _emit_current_locked_note() -> void:
+	if _locked_note == "--":
+		_detected_frequency = 0.0
+		_detected_note = "--"
+		_detected_confidence = 0.0
+		return
+	_detected_frequency = _locked_frequency
+	_detected_note = _locked_note
+	_detected_confidence = _locked_confidence
+	note_detected.emit(_detected_frequency, _detected_note, _detected_confidence)
+
+
+func _release_locked_note(note_name: String) -> void:
+	_locked_note = "--"
+	_locked_frequency = 0.0
+	_locked_confidence = 0.0
+	_detected_frequency = 0.0
+	_detected_note = "--"
+	_detected_confidence = 0.0
+	note_released.emit(note_name)
+	note_detected.emit(_detected_frequency, _detected_note, _detected_confidence)
+
+
+func _apply_capture_status(source: String, detection: Dictionary) -> void:
+	if source == "GDScriptFFT" and String(detection.get("fallback_reason", "")) != "":
+		_set_status("Locked (%s: %s)" % [source, String(detection.get("fallback_reason", ""))])
+	else:
+		_set_status("Locked (%s)" % source)
 
 
 func _set_status(status: String) -> void:
