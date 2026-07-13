@@ -1,0 +1,223 @@
+[gd_scene format=3 uid="uid://cv7f007xpcex"]
+
+[ext_resource type="Script" uid="uid://cakgs5i8tpavu" path="res://src/gd/ui/ProfileSelectScene.gd" id="1_psel"]
+[ext_resource type="Texture2D" uid="uid://c410w2vsq4e8b" path="res://src/gd/assets/ui/backgrounds/switch_profile.png" id="2_qdot7"]
+[ext_resource type="FontFile" uid="uid://hmqxcjyc1jhw" path="res://src/gd/assets/ui/fonts/PixeloidSans.ttf" id="3_body"]
+[ext_resource type="FontFile" uid="uid://c6qm036pbwuuv" path="res://src/gd/assets/ui/fonts/menu_button.ttf" id="4_btn"]
+[ext_resource type="Texture2D" uid="uid://bgt2gthcupd14" path="res://src/gd/assets/ui/menu/borders/border3.png" id="6_flourish"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_create_btn_normal"]
+bg_color = Color(0.847, 0.596, 0.188, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.827, 0.392, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0.18, 0.1, 0.04, 0.85)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_create_btn_hover"]
+bg_color = Color(0.91, 0.69, 0.29, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.9, 0.55, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0.18, 0.1, 0.04, 0.85)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_create_btn_disabled"]
+bg_color = Color(0.36, 0.28, 0.13, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.4, 0.18, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="ProfileSelectScene" type="Control" unique_id=21407969]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_psel")
+
+[node name="Background" type="ColorRect" parent="." unique_id=798157722]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.025, 0.027, 0.049, 1)
+
+[node name="BackgroundTexture" type="TextureRect" parent="." unique_id=1056076780]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.5921569)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_qdot7")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="SafeArea" type="MarginContainer" parent="." unique_id=1851497131]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 36
+theme_override_constants/margin_bottom = 28
+
+[node name="RootVBox" type="VBoxContainer" parent="SafeArea" unique_id=1856835047]
+layout_mode = 2
+theme_override_constants/separation = 22
+
+[node name="TitleRow" type="HBoxContainer" parent="SafeArea/RootVBox" unique_id=103096341]
+layout_mode = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="LeftMusicNote" type="TextureRect" parent="SafeArea/RootVBox/TitleRow" unique_id=72006349]
+unique_name_in_owner = true
+modulate = Color(1, 0.86, 0.39, 1)
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("6_flourish")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="SafeArea/RootVBox/TitleRow" unique_id=1233108818]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.39, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.55)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("4_btn")
+theme_override_font_sizes/font_size = 62
+text = "Profile Selection"
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+
+[node name="RightMusicNote" type="TextureRect" parent="SafeArea/RootVBox/TitleRow" unique_id=286081908]
+unique_name_in_owner = true
+modulate = Color(1, 0.86, 0.39, 1)
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("6_flourish")
+expand_mode = 1
+stretch_mode = 5
+flip_h = true
+
+[node name="StatusLabel" type="Label" parent="SafeArea/RootVBox" unique_id=313729421]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.86, 0.52, 1)
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 16
+text = "Select a profile to continue."
+horizontal_alignment = 1
+
+[node name="ProfileRow" type="HBoxContainer" parent="SafeArea/RootVBox" unique_id=1778837311]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 34
+alignment = 1
+
+[node name="ProfilesContainer" type="GridContainer" parent="SafeArea/RootVBox/ProfileRow" unique_id=1107548954]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 24
+theme_override_constants/v_separation = 0
+columns = 3
+
+[node name="BottomContainer" type="VBoxContainer" parent="SafeArea/RootVBox" unique_id=37299904]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="CreateProfileButton" type="Button" parent="SafeArea/RootVBox/BottomContainer" unique_id=515848150]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(380, 58)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.18, 0.09, 0.03, 1)
+theme_override_fonts/font = ExtResource("4_btn")
+theme_override_font_sizes/font_size = 44
+theme_override_styles/normal = SubResource("StyleBoxFlat_create_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_create_btn_hover")
+theme_override_styles/hover = SubResource("StyleBoxFlat_create_btn_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_create_btn_disabled")
+text = "CREATE NEW PROFILE"
+
+[node name="SecondaryActions" type="HBoxContainer" parent="SafeArea/RootVBox/BottomContainer" unique_id=164669339]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="CalibrateButton" type="Button" parent="SafeArea/RootVBox/BottomContainer/SecondaryActions" unique_id=1214309795]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 16
+text = "Recalibrate Mic"
+
+[node name="BackButton" type="Button" parent="SafeArea/RootVBox/BottomContainer/SecondaryActions" unique_id=2106824426]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 16
+text = "Quit"
+
+[node name="CreateDialog" type="AcceptDialog" parent="." unique_id=1898419682]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Create Profile"
+size = Vector2i(380, 150)
+
+[node name="NameEdit" type="LineEdit" parent="CreateDialog" unique_id=2003967100]
+unique_name_in_owner = true
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 372.0
+offset_bottom = 101.0
+placeholder_text = "Enter profile name"
+max_length = 24
+
+[node name="DeleteDialog" type="ConfirmationDialog" parent="." unique_id=1456290123]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Delete Profile"
+ok_button_text = "Delete"

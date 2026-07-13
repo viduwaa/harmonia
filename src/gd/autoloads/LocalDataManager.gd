@@ -5,12 +5,30 @@ const CALIBRATION_FILE_PATH: String = "user://save/audio_calibration.json"
 const CALIBRATION_VERSION: int = 1
 const BATTLE_DEBUG_CONFIG_FILE_PATH: String = "user://save/battle_debug_config.json"
 const BATTLE_DEBUG_CONFIG_VERSION: int = 1
+const PRACTICE_SETTINGS_FILE_PATH: String = "user://save/practice_settings.json"
+const PRACTICE_SETTINGS_VERSION: int = 1
+# Per-note practice hold time limits.
+const PRACTICE_MIN_TURN_TIME_SEC: float = 1.0
+const PRACTICE_MAX_TURN_TIME_SEC: float = 30.0
+const PRACTICE_DEFAULT_TURN_TIME_SEC: float = 4.0
+# Octave match mode for the practice frequency meter.
+# "pitch_class" ignores octave (C4 target, C5 voice = in tune).
+# "exact_octave" requires the same frequency class AND octave.
+const PRACTICE_OCTAVE_MODE_PITCH_CLASS: String = "pitch_class"
+const PRACTICE_OCTAVE_MODE_EXACT_OCTAVE: String = "exact_octave"
+const PRACTICE_DEFAULT_OCTAVE_MODE: String = PRACTICE_OCTAVE_MODE_PITCH_CLASS
 const PROFILE_FILE_PATH: String = "user://save/profile.json"
 const PROFILE_VERSION: int = 1
 const EXPLORE_STATE_FILE_PATH: String = "user://save/explore_state.json"
 const EXPLORE_STATE_VERSION: int = 1
 const LEVEL_PROGRESS_FILE_PATH: String = "user://save/level_progress.json"
 const LEVEL_PROGRESS_VERSION: int = 1
+const PROFILES_FILE_PATH: String = "user://save/profiles.json"
+const PROFILES_VERSION: int = 1
+const MAX_PROFILES: int = 3
+const DEFAULT_PROFILE_NAME: String = "Player 1"
+const ACTIVE_PROFILE_FILE_PATH: String = "user://save/active_profile.json"
+const ACTIVE_PROFILE_VERSION: int = 1
 const NOTE_ATTEMPTS_FILE_PATH: String = "user://save/note_attempts.jsonl"
 const GAME_SESSIONS_FILE_PATH: String = "user://save/game_sessions.jsonl"
 const NOTE_ATTEMPT_VERSION: int = 1
@@ -55,6 +73,7 @@ var _has_persisted_storage_adapter_preference: bool = false
 func _ready() -> void:
 	_load_save_diagnostics_settings()
 	_apply_startup_storage_adapter_rollout()
+	_ensure_profiles_store()
 	_run_auto_cleanup("startup")
 
 
@@ -145,6 +164,54 @@ func load_battle_debug_config() -> Dictionary:
 	}
 
 
+func save_practice_settings(settings: Dictionary) -> bool:
+	if not _ensure_save_dir():
+		return false
+
+	var turn_time: float = float(settings.get("turn_time_sec", PRACTICE_DEFAULT_TURN_TIME_SEC))
+	turn_time = clampf(turn_time, PRACTICE_MIN_TURN_TIME_SEC, PRACTICE_MAX_TURN_TIME_SEC)
+
+	var octave_mode: String = String(settings.get("octave_match_mode", PRACTICE_DEFAULT_OCTAVE_MODE))
+	if octave_mode != PRACTICE_OCTAVE_MODE_PITCH_CLASS and octave_mode != PRACTICE_OCTAVE_MODE_EXACT_OCTAVE:
+		octave_mode = PRACTICE_DEFAULT_OCTAVE_MODE
+
+	var payload: Dictionary = {
+		"version": PRACTICE_SETTINGS_VERSION,
+		"practice_settings": {
+			"turn_time_sec": turn_time,
+			"octave_match_mode": octave_mode
+		}
+	}
+	return _write_json_document(PRACTICE_SETTINGS_FILE_PATH, payload, "practice settings")
+
+
+func load_practice_settings() -> Dictionary:
+	var defaults: Dictionary = {
+		"turn_time_sec": PRACTICE_DEFAULT_TURN_TIME_SEC,
+		"octave_match_mode": PRACTICE_DEFAULT_OCTAVE_MODE
+	}
+	if not FileAccess.file_exists(PRACTICE_SETTINGS_FILE_PATH):
+		return defaults
+	var root: Dictionary = _read_json_document(PRACTICE_SETTINGS_FILE_PATH, "practice settings")
+	if root.is_empty():
+		return defaults
+	var settings: Dictionary = root.get("practice_settings", {}) as Dictionary
+	if settings.is_empty():
+		return defaults
+
+	var turn_time: float = float(settings.get("turn_time_sec", PRACTICE_DEFAULT_TURN_TIME_SEC))
+	turn_time = clampf(turn_time, PRACTICE_MIN_TURN_TIME_SEC, PRACTICE_MAX_TURN_TIME_SEC)
+
+	var octave_mode: String = String(settings.get("octave_match_mode", PRACTICE_DEFAULT_OCTAVE_MODE))
+	if octave_mode != PRACTICE_OCTAVE_MODE_PITCH_CLASS and octave_mode != PRACTICE_OCTAVE_MODE_EXACT_OCTAVE:
+		octave_mode = PRACTICE_DEFAULT_OCTAVE_MODE
+
+	return {
+		"turn_time_sec": turn_time,
+		"octave_match_mode": octave_mode
+	}
+
+
 func save_profile(profile: Dictionary) -> bool:
 	if profile.is_empty():
 		return false
@@ -168,6 +235,11 @@ func save_profile(profile: Dictionary) -> bool:
 
 
 func load_profile() -> Dictionary:
+	var active_name: String = get_active_profile_name()
+	if not active_name.is_empty():
+		var active: Dictionary = get_profile(active_name)
+		if not active.is_empty():
+			return active
 	if not FileAccess.file_exists(PROFILE_FILE_PATH):
 		return _default_profile()
 	var root: Dictionary = _read_json_document(PROFILE_FILE_PATH, "profile")
@@ -292,6 +364,13 @@ func save_level_progress(level_progress: Dictionary) -> bool:
 
 
 func load_level_progress() -> Dictionary:
+	var active_name: String = get_active_profile_name()
+	if not active_name.is_empty():
+		var active: Dictionary = get_profile(active_name)
+		if not active.is_empty():
+			var lp_variant: Variant = active.get("level_progress", {})
+			if typeof(lp_variant) == TYPE_DICTIONARY and not (lp_variant as Dictionary).is_empty():
+				return _normalize_level_progress(lp_variant as Dictionary)
 	if not FileAccess.file_exists(LEVEL_PROGRESS_FILE_PATH):
 		return _default_level_progress()
 	var root: Dictionary = _read_json_document(LEVEL_PROGRESS_FILE_PATH, "level progress")
@@ -316,6 +395,130 @@ func load_level_progress() -> Dictionary:
 		"last_result": String(level_progress.get("last_result", "")),
 		"last_updated_unix_sec": int(level_progress.get("last_updated_unix_sec", 0))
 	}
+
+
+func has_audio_calibration() -> bool:
+	return not load_audio_calibration().is_empty()
+
+
+func list_profiles() -> Array:
+	var doc: Dictionary = _read_profiles_document()
+	var profiles: Variant = doc.get("profiles", [])
+	if profiles is Array:
+		return profiles as Array
+	return []
+
+
+func get_profile_count() -> int:
+	return list_profiles().size()
+
+
+func get_profile(name: String) -> Dictionary:
+	var target: String = String(name).strip_edges()
+	for profile_variant: Variant in list_profiles():
+		if not (profile_variant is Dictionary):
+			continue
+		var profile: Dictionary = profile_variant as Dictionary
+		if String(profile.get("name", "")) == target:
+			return profile.duplicate(true)
+	return {}
+
+
+func create_profile(name: String) -> Dictionary:
+	var clean_name: String = String(name).strip_edges()
+	if clean_name.is_empty():
+		push_warning("LocalDataManager: Cannot create profile with empty name.")
+		return {}
+	if clean_name.length() > 24:
+		clean_name = clean_name.substr(0, 24)
+
+	if get_profile_count() >= MAX_PROFILES:
+		push_warning("LocalDataManager: Profile limit (%d) reached; cannot create '%s'." % [MAX_PROFILES, clean_name])
+		return {}
+	if not get_profile(clean_name).is_empty():
+		push_warning("LocalDataManager: Profile name '%s' already exists." % clean_name)
+		return {}
+
+	var record: Dictionary = _default_profile_record(clean_name)
+	var profiles: Array = list_profiles()
+	profiles.append(record)
+	if not _write_profiles_document(profiles):
+		return {}
+	return record.duplicate(true)
+
+
+func save_profile_by_name(name: String, record: Dictionary) -> bool:
+	if record.is_empty():
+		return false
+	var target: String = String(name).strip_edges()
+	if target.is_empty():
+		target = String(record.get("name", "")).strip_edges()
+	if target.is_empty():
+		return false
+
+	var profiles: Array = list_profiles()
+	var replaced: bool = false
+	for index: int in range(profiles.size()):
+		var existing: Dictionary = profiles[index] as Dictionary
+		if String(existing.get("name", "")) == target:
+			var merged: Dictionary = existing.duplicate(true)
+			for key: Variant in record.keys():
+				merged[key] = record[key]
+			merged["name"] = target
+			profiles[index] = merged
+			replaced = true
+			break
+	if not replaced:
+		return false
+	return _write_profiles_document(profiles)
+
+
+func delete_profile(name: String) -> bool:
+	var target: String = String(name).strip_edges()
+	if target.is_empty():
+		return false
+
+	var profiles: Array = list_profiles()
+	var filtered: Array = []
+	var found: bool = false
+	for profile_variant: Variant in profiles:
+		if not (profile_variant is Dictionary):
+			continue
+		var profile: Dictionary = profile_variant as Dictionary
+		if String(profile.get("name", "")) == target:
+			found = true
+			continue
+		filtered.append(profile)
+	if not found:
+		return false
+
+	if not _write_profiles_document(filtered):
+		return false
+
+	if get_active_profile_name() == target:
+		set_active_profile_name("")
+	return true
+
+
+func set_active_profile_name(name: String) -> bool:
+	var clean: String = String(name).strip_edges()
+	if not clean.is_empty() and get_profile(clean).is_empty():
+		push_warning("LocalDataManager: Cannot set active profile; '%s' not found." % clean)
+		return false
+	var payload: Dictionary = {
+		"version": ACTIVE_PROFILE_VERSION,
+		"active_profile_name": clean
+	}
+	return _write_json_document(ACTIVE_PROFILE_FILE_PATH, payload, "active profile")
+
+
+func get_active_profile_name() -> String:
+	if not FileAccess.file_exists(ACTIVE_PROFILE_FILE_PATH):
+		return ""
+	var root: Dictionary = _read_json_document(ACTIVE_PROFILE_FILE_PATH, "active profile")
+	if root.is_empty():
+		return ""
+	return String(root.get("active_profile_name", "")).strip_edges()
 
 
 func append_note_attempt(note_attempt: Dictionary) -> bool:
@@ -788,19 +991,30 @@ func run_storage_adapter_parity_check() -> Dictionary:
 	var base_dir: String = "user://save/parity/%d" % int(Time.get_unix_time_from_system())
 	var cases: Array = [
 		{
-			"name": "profile",
+			"name": "profiles",
 			"payload": {
-				"version": PROFILE_VERSION,
-				"profile": {
-					"xp_total": 321,
-					"battles_played": 7,
-					"wins": 4,
-					"losses": 3,
-					"last_result": "Win",
-					"last_session_id": "parity_session",
-					"last_xp_gain": 120,
-					"last_updated_unix_sec": 1111111111
-				}
+				"version": PROFILES_VERSION,
+				"profiles": [
+					{
+						"name": "Parity Player",
+						"xp_total": 321,
+						"battles_played": 7,
+						"wins": 4,
+						"losses": 3,
+						"last_result": "Win",
+						"last_session_id": "parity_session",
+						"last_xp_gain": 120,
+						"last_updated_unix_sec": 1111111111,
+						"avg_accuracy": 87.5,
+						"level_progress": {
+							"current_level_index": 4,
+							"max_level_reached": 4,
+							"completed_level_ids": ["L1", "L2", "L3"],
+							"last_result": "Win",
+							"last_updated_unix_sec": 1111111111
+						}
+					}
+				]
 			}
 		},
 		{
@@ -946,6 +1160,8 @@ func export_save_snapshot() -> Dictionary:
 	var candidate_files: Dictionary = {
 		"audio_calibration.json": CALIBRATION_FILE_PATH,
 		"battle_debug_config.json": BATTLE_DEBUG_CONFIG_FILE_PATH,
+		"profiles.json": PROFILES_FILE_PATH,
+		"active_profile.json": ACTIVE_PROFILE_FILE_PATH,
 		"profile.json": PROFILE_FILE_PATH,
 		"explore_state.json": EXPLORE_STATE_FILE_PATH,
 		"level_progress.json": LEVEL_PROGRESS_FILE_PATH,
@@ -1061,8 +1277,7 @@ func _build_migration_readiness(
 	var warn_reasons: PackedStringArray = PackedStringArray()
 
 	var required_files: PackedStringArray = PackedStringArray([
-		PROFILE_FILE_PATH,
-		LEVEL_PROGRESS_FILE_PATH,
+		PROFILES_FILE_PATH,
 		SAVE_DIAGNOSTICS_FILE_PATH,
 		NOTE_ATTEMPTS_FILE_PATH,
 		GAME_SESSIONS_FILE_PATH
@@ -1081,24 +1296,13 @@ func _build_migration_readiness(
 		warn_reasons
 	)
 
-	var profile_doc_check: Dictionary = _evaluate_document_contract(PROFILE_FILE_PATH, "profile")
+	var profiles_doc_check: Dictionary = _evaluate_profiles_document_contract()
 	_append_migration_check(
 		checks,
-		"profile_document_contract",
-		bool(profile_doc_check.get("ok", false)),
+		"profiles_document_contract",
+		bool(profiles_doc_check.get("ok", false)),
 		"fail",
-		String(profile_doc_check.get("detail", "")),
-		fail_reasons,
-		warn_reasons
-	)
-
-	var level_doc_check: Dictionary = _evaluate_document_contract(LEVEL_PROGRESS_FILE_PATH, "level_progress")
-	_append_migration_check(
-		checks,
-		"level_progress_document_contract",
-		bool(level_doc_check.get("ok", false)),
-		"fail",
-		String(level_doc_check.get("detail", "")),
+		String(profiles_doc_check.get("detail", "")),
 		fail_reasons,
 		warn_reasons
 	)
@@ -1472,6 +1676,77 @@ func _evaluate_document_contract(file_path: String, payload_key: String) -> Dict
 	return {
 		"ok": true,
 		"detail": "Document contract valid."
+	}
+
+
+func _evaluate_profiles_document_contract() -> Dictionary:
+	if _storage_adapter == null:
+		_configure_storage_adapter(STORAGE_ADAPTER_DEFAULT_ID)
+	if _storage_adapter == null or not _storage_adapter.has_method("read_json_document"):
+		return {
+			"ok": false,
+			"detail": "No readable storage adapter for %s" % PROFILES_FILE_PATH.get_file()
+		}
+
+	var read_result: Dictionary = _storage_adapter.call("read_json_document", PROFILES_FILE_PATH) as Dictionary
+	if read_result == null or not bool(read_result.get("ok", false)):
+		var read_error: String = String(read_result.get("error", "unknown error")) if read_result != null else "null result"
+		return {
+			"ok": false,
+			"detail": "Adapter read failed for %s: %s" % [PROFILES_FILE_PATH.get_file(), read_error]
+		}
+
+	var root: Dictionary = read_result.get("data", {}) as Dictionary
+	if root.is_empty():
+		return {
+			"ok": false,
+			"detail": "Profiles document empty: %s" % PROFILES_FILE_PATH.get_file()
+		}
+	if not root.has("version"):
+		return {
+			"ok": false,
+			"detail": "Missing version field: %s" % PROFILES_FILE_PATH.get_file()
+		}
+	if not root.has("profiles") or typeof(root.get("profiles", [])) != TYPE_ARRAY:
+		return {
+			"ok": false,
+			"detail": "Missing or invalid 'profiles' array: %s" % PROFILES_FILE_PATH.get_file()
+		}
+
+	var profiles: Array = root.get("profiles", []) as Array
+	if profiles.size() > MAX_PROFILES:
+		return {
+			"ok": false,
+			"detail": "Profiles count (%d) exceeds max (%d)." % [profiles.size(), MAX_PROFILES]
+		}
+
+	for index: int in range(profiles.size()):
+		var entry_variant: Variant = profiles[index]
+		if not (entry_variant is Dictionary):
+			return {
+				"ok": false,
+				"detail": "Profile entry %d is not a Dictionary." % index
+			}
+		var entry: Dictionary = entry_variant as Dictionary
+		if not entry.has("name") or String(entry.get("name", "")).is_empty():
+			return {
+				"ok": false,
+				"detail": "Profile entry %d missing 'name'." % index
+			}
+		if not entry.has("avg_accuracy"):
+			return {
+				"ok": false,
+				"detail": "Profile entry %d missing 'avg_accuracy'." % index
+			}
+		if not entry.has("level_progress") or typeof(entry.get("level_progress", {})) != TYPE_DICTIONARY:
+			return {
+				"ok": false,
+				"detail": "Profile entry %d missing 'level_progress'." % index
+			}
+
+	return {
+		"ok": true,
+		"detail": "Profiles document contract valid."
 	}
 
 
@@ -2028,6 +2303,81 @@ func _default_profile() -> Dictionary:
 		"last_session_id": "",
 		"last_xp_gain": 0,
 		"last_updated_unix_sec": 0
+	}
+
+
+func _default_profile_record(name: String) -> Dictionary:
+	return {
+		"name": String(name).strip_edges(),
+		"xp_total": 0,
+		"battles_played": 0,
+		"wins": 0,
+		"losses": 0,
+		"last_result": "",
+		"last_session_id": "",
+		"last_xp_gain": 0,
+		"last_updated_unix_sec": 0,
+		"avg_accuracy": 0.0,
+		"level_progress": _default_level_progress()
+	}
+
+
+func _read_profiles_document() -> Dictionary:
+	if not FileAccess.file_exists(PROFILES_FILE_PATH):
+		return {"version": PROFILES_VERSION, "profiles": []}
+	var root: Dictionary = _read_json_document(PROFILES_FILE_PATH, "profiles")
+	if root.is_empty():
+		return {"version": PROFILES_VERSION, "profiles": []}
+	if not root.has("profiles") or typeof(root.get("profiles", [])) != TYPE_ARRAY:
+		return {"version": PROFILES_VERSION, "profiles": []}
+	return root
+
+
+func _write_profiles_document(profiles: Array) -> bool:
+	if not _ensure_save_dir():
+		return false
+	var payload: Dictionary = {
+		"version": PROFILES_VERSION,
+		"profiles": profiles
+	}
+	return _write_json_document(PROFILES_FILE_PATH, payload, "profiles")
+
+
+func _ensure_profiles_store() -> void:
+	if FileAccess.file_exists(PROFILES_FILE_PATH):
+		return
+	if FileAccess.file_exists(PROFILE_FILE_PATH) or FileAccess.file_exists(LEVEL_PROGRESS_FILE_PATH):
+		_import_legacy_profile_into_profiles()
+		return
+	_write_profiles_document([])
+
+
+func _import_legacy_profile_into_profiles() -> void:
+	var legacy_profile: Dictionary = load_profile()
+	var legacy_level_progress: Dictionary = load_level_progress()
+	var record: Dictionary = _default_profile_record(DEFAULT_PROFILE_NAME)
+	for key: Variant in legacy_profile.keys():
+		if record.has(key):
+			record[key] = legacy_profile[key]
+	if not legacy_level_progress.is_empty():
+		record["level_progress"] = legacy_level_progress
+	_write_profiles_document([record])
+
+
+func _normalize_level_progress(level_progress: Dictionary) -> Dictionary:
+	var completed_levels: PackedStringArray = PackedStringArray()
+	var raw_completed_level_ids: Variant = level_progress.get("completed_level_ids", PackedStringArray())
+	if raw_completed_level_ids is PackedStringArray:
+		completed_levels = raw_completed_level_ids
+	elif raw_completed_level_ids is Array:
+		for level_value: Variant in raw_completed_level_ids:
+			completed_levels.append(String(level_value))
+	return {
+		"current_level_index": int(level_progress.get("current_level_index", 1)),
+		"max_level_reached": int(level_progress.get("max_level_reached", 1)),
+		"completed_level_ids": completed_levels,
+		"last_result": String(level_progress.get("last_result", "")),
+		"last_updated_unix_sec": int(level_progress.get("last_updated_unix_sec", 0))
 	}
 
 

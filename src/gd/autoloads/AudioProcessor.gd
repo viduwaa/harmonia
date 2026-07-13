@@ -8,6 +8,10 @@ signal capture_state_changed(is_capturing: bool)
 signal input_level_changed(level_db: float)
 signal backend_mode_changed(mode: String)
 signal diagnostic_logged(message: String)
+## Frequency-meter visualization data. Emitted each capture frame while a meter
+## center is configured. bins[i].x = band center Hz, bins[i].y = magnitude
+## (linear, 0..1). band_count bands span +/-1 octave around the meter center.
+signal spectrum_bins_updated(bins: PackedVector2Array, center_hz: float)
 
 const MIN_FREQUENCY_HZ: float = 60.0
 const MAX_FREQUENCY_HZ: float = 1400.0
@@ -26,6 +30,9 @@ const CAPTURE_FRAME_COUNT: int = 2048
 const CSHARP_PITCH_CLASS_NAME: String = "PitchDecisionService"
 const CSHARP_PITCH_SINGLETON_PATH: NodePath = ^"/root/PitchDecisionService"
 const BACKEND_RETRY_INTERVAL_SEC: float = 1.0
+# Frequency-meter bands: count and span (in octaves) around the meter center.
+const METER_BAND_COUNT: int = 24
+const METER_BAND_SPAN_OCTAVES: float = 2.0  # +/-1 octave either side
 # English note classes used in code with Sinhala solfege reference:
 # C = ඩෝ (Do), C# = ඩෝ ශාප් (Do Sharp)
 # D = රේ (Re), D# = රේ ශාප් (Re Sharp)
@@ -68,6 +75,9 @@ var _noise_floor_db: float = -80.0
 var _effective_min_signal_db: float = DEFAULT_MIN_SIGNAL_DB
 var _status_text: String = "Idle"
 var _last_csharp_skip_reason: String = "C# backend not resolved"
+# Frequency-meter center Hz. When > 0, spectrum_bins_updated is emitted each
+# capture frame with bands centered on this frequency (set by practice scene).
+var _meter_center_hz: float = 0.0
 
 
 func _ready() -> void:
@@ -135,6 +145,13 @@ func stop_capture() -> void:
 	_reset_note_decision_state()
 	_set_status("Idle")
 	_log_event("Capture stopped")
+	# Clear the frequency meter with a zeroed frame so listeners can dim/blank.
+	if _meter_center_hz > 0.0:
+		var zero_bins: PackedVector2Array = PackedVector2Array()
+		zero_bins.resize(METER_BAND_COUNT)
+		for i: int in range(METER_BAND_COUNT):
+			zero_bins[i] = Vector2(0.0, 0.0)
+		spectrum_bins_updated.emit(zero_bins, _meter_center_hz)
 	capture_state_changed.emit(false)
 	note_released.emit("--")
 	note_detected.emit(_detected_frequency, _detected_note, _detected_confidence)
@@ -260,6 +277,81 @@ func convert_hz_to_note(frequency: float) -> String:
 	var note_index: int = posmod(midi_note, 12)
 	var octave: int = int(floor(midi_note / 12.0)) - 1
 	return "%s%d" % [NOTE_NAMES[note_index], octave]
+
+
+## Set the frequency-meter center (Hz). When > 0 and capturing, the
+## spectrum_bins_updated signal fires each frame with METER_BAND_COUNT bands
+## spanning +/-1 octave around this frequency. Pass 0.0 to disable emission.
+func set_meter_center_hz(hz: float) -> void:
+	_meter_center_hz = maxf(float(hz), 0.0)
+
+
+func get_meter_center_hz() -> float:
+	return _meter_center_hz
+
+
+## Returns the equal-tempered frequency (A4=440Hz) for a MIDI note number.
+func midi_to_hz(midi_note: int) -> float:
+	return 440.0 * pow(2.0, (float(midi_note) - 69.0) / 12.0)
+
+
+## Returns the MIDI note number for a note name like "C4" or "A#3".
+## Returns -1 if the name cannot be parsed.
+func note_to_midi(note_name: String) -> int:
+	var cleaned: String = note_name.strip_edges().to_upper()
+	if cleaned.is_empty() or cleaned.length() < 2:
+		return -1
+	# Pitch class: 1-2 leading chars (letter + optional accidental).
+	# ``class_name`` is a GDScript keyword; use ``pitch_class_name`` instead.
+	var pitch_class_name: String = ""
+	var octave_str: String = ""
+	var i: int = 0
+	if i < cleaned.length() and cleaned[i] >= "A" and cleaned[i] <= "G":
+		pitch_class_name += cleaned[i]
+		i += 1
+		if i < cleaned.length() and (cleaned[i] == "#" or cleaned[i] == "B"):
+			pitch_class_name += cleaned[i]
+			i += 1
+	else:
+		return -1
+
+	octave_str = cleaned.substr(i)
+	if octave_str.is_valid_int():
+		var octave: int = int(octave_str)
+		var class_index: int = NOTE_NAMES.find(pitch_class_name)
+		if class_index == -1:
+			return -1
+		return (octave + 1) * 12 + class_index
+	return -1
+
+
+## Build the per-band magnitude snapshot for the frequency meter and emit it.
+## Bands are logarithmically spaced across +/-1 octave around _meter_center_hz.
+func _emit_spectrum_bins() -> void:
+	if _meter_center_hz <= 0.0 or _spectrum == null:
+		return
+	var bins: PackedVector2Array = PackedVector2Array()
+	bins.resize(METER_BAND_COUNT)
+	# Log-spaced band centers: center * 2^(-1 + 2*i/(N-1)).
+	var half_span: float = METER_BAND_SPAN_OCTAVES * 0.5
+	var bin_width_octaves: float = (2.0 * half_span) / float(METER_BAND_COUNT - 1)
+	# Per-band half-width in Hz (a fraction of the band spacing for overlap).
+	for i: int in range(METER_BAND_COUNT):
+		var octave_offset: float = -half_span + bin_width_octaves * float(i)
+		var band_center_hz: float = _meter_center_hz * pow(2.0, octave_offset)
+		var band_half_hz: float = band_center_hz * (pow(2.0, bin_width_octaves * 0.5) - 1.0) * 0.6
+		var lo: float = max(band_center_hz - band_half_hz, MIN_FREQUENCY_HZ)
+		var hi: float = min(band_center_hz + band_half_hz, MAX_FREQUENCY_HZ)
+		var mag_stereo: Vector2 = _spectrum.get_magnitude_for_frequency_range(
+			lo,
+		hi,
+		AudioEffectSpectrumAnalyzerInstance.MAGNITUDE_MAX
+		)
+		var mag: float = (mag_stereo.x + mag_stereo.y) * 0.5
+		# Normalize to 0..1 with a gentle curve for readability.
+		var normalized: float = clamp(sqrt(mag) * 12.0, 0.0, 1.0)
+		bins[i] = Vector2(band_center_hz, normalized)
+	spectrum_bins_updated.emit(bins, _meter_center_hz)
 
 
 func _setup_microphone_player() -> void:
@@ -462,6 +554,7 @@ func _analyze_spectrum_bins() -> Dictionary:
 
 
 func _update_detection(delta: float) -> void:
+	_emit_spectrum_bins()
 	var detection: Dictionary = _try_csharp_yin_detection()
 	if not bool(detection.get("valid", false)):
 		_last_csharp_skip_reason = String(detection.get("reason", "YIN fallback"))

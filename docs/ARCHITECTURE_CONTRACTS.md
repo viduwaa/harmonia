@@ -121,9 +121,27 @@ Required keys:
 
 ### Save Documents (versioned root)
 
-- profile.json: root keys version + profile
-- level_progress.json: root keys version + level_progress
+- profiles.json: root keys version + profiles (Array, max 3). Each element: name + xp_total + battles_played + wins + losses + last_result + last_session_id + last_xp_gain + last_updated_unix_sec + avg_accuracy + level_progress (inline Dictionary mirroring level_progress schema below). UI shows name, level (= level_progress.current_level_index), avg_accuracy only.
+- active_profile.json: root keys version + active_profile_name (String, may be empty when no profile selected).
+- level_progress.json: root keys version + level_progress (legacy; superseded by per-profile inline level_progress but retained for migration import and parity testing).
+- profile.json: root keys version + profile (legacy single-profile; superseded by profiles.json but retained for migration import).
 - save_diagnostics.json: root keys version + save_diagnostics
+
+### Profile Manager Contracts (multi-profile)
+
+- LocalDataManager owns the profiles collection: create/list/get/save-by-name/delete, active-profile get/set, has_audio_calibration (first-time detection).
+- GameStateManager.set_active_profile(name) loads the selected profile's merged record (profile + inline level_progress) into its in-memory _profile/_level_progress; persists active selection via LocalDataManager. Emits active_profile_changed and progression_updated.
+- GameStateManager._save_progress_documents writes back via save_profile_by_name(active_name, merged) so profile progression lands in profiles.json (mirrored to SQLite).
+- GameStateManager._recompute_avg_accuracy scans NOTE_ATTEMPT records for the active profile's grade distribution; avg_accuracy = (Perfect + Good) / total * 100.
+- BattleManager stamps profile_name (read from GameStateManager at battle start) onto NOTE_ATTEMPT and GAME_SESSION payloads so accuracy attribution is per-profile. Additive field; no breaking schema change.
+- Profile count is hard-capped at MAX_PROFILES = 3; names must be non-empty, unique, and length <= 24.
+
+### Launch Flow Contracts (first-run weather routing)
+
+- BootScene (project main_scene) routes: no saved mic calibration -> MicrophoneCalibrationScene; calibration present -> ProfileSelectScene.
+- MicrophoneCalibrationScene "Save & Continue" -> ProfileSelectScene. "Back" returns to ProfileSelectScene when calibration exists, else MainMenuScene.
+- ProfileSelectScene routes to MainMenuScene after a profile is selected; offers "Recalibrate Mic" -> MicrophoneCalibrationScene.
+- MainMenuScene "Start" launches ExploreWorld using the active profile; if no active profile and profiles exist, it redirects to ProfileSelectScene. "Switch Profile" routes to ProfileSelectScene.
 
 ## Hybrid Boundary (GDScript + C#)
 

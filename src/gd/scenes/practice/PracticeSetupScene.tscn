@@ -1,0 +1,273 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://src/gd/ui/PracticeSetupScene.gd" id="1_setup"]
+[ext_resource type="FontFile" path="res://src/gd/assets/ui/fonts/menu_button.ttf" id="2_title"]
+[ext_resource type="FontFile" path="res://src/gd/assets/ui/fonts/PixeloidSans.ttf" id="3_body"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.137255, 0.0941176, 0.266667, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.847059, 0.615686, 0.239216, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
+bg_color = Color(0.847059, 0.596078, 0.188235, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.827451, 0.392157, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="PracticeSetupScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_setup")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0666667, 0.0431373, 0.145098, 1)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="RootVBox" type="VBoxContainer" parent="SafeArea"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="HeaderRow" type="HBoxContainer" parent="SafeArea/RootVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BackButton" type="Button" parent="SafeArea/RootVBox/HeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(120, 34)
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Back"
+
+[node name="TitleLabel" type="Label" parent="SafeArea/RootVBox/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(1, 0.843137, 0.403922, 1)
+text = "Practice Mode"
+horizontal_alignment = 1
+
+[node name="ContentRow" type="HBoxContainer" parent="SafeArea/RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="NotePanel" type="PanelContainer" parent="SafeArea/RootVBox/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 1
+size_flags_vertical = 3
+custom_minimum_size = Vector2(250, 0)
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="NoteMargin" type="MarginContainer" parent="SafeArea/RootVBox/ContentRow/NotePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="NoteVBox" type="VBoxContainer" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="NoteSelectLabel" type="Label" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.843137, 0.403922, 1)
+text = "NOTE SELECT"
+horizontal_alignment = 1
+
+[node name="SelectedNoteValue" type="Label" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+text = "--"
+horizontal_alignment = 1
+
+[node name="NoteList" type="VBoxContainer" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NoteButtonC" type="Button" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox/NoteList"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "C"
+
+[node name="NoteButtonD" type="Button" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox/NoteList"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "D"
+
+[node name="NoteButtonE" type="Button" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox/NoteList"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "E"
+
+[node name="NoteButtonF" type="Button" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox/NoteList"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "F"
+
+[node name="NoteButtonG" type="Button" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox/NoteList"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "G"
+
+[node name="NoteButtonA" type="Button" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox/NoteList"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "A"
+
+[node name="NoteButtonB" type="Button" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox/NoteList"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "B"
+
+[node name="TimerRow" type="HBoxContainer" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TimerLabel" type="Label" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox/TimerRow"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1, 0.843137, 0.403922, 1)
+text = "HOLD TIME"
+
+[node name="TimerSpinBox" type="SpinBox" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox/TimerRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min = 1.0
+max = 30.0
+step = 0.5
+value = 4.0
+suffix = " s"
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 14
+
+[node name="TimerPresetMenu" type="OptionButton" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox/TimerRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(90, 0)
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+
+[node name="StartPracticeButton" type="Button" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 42)
+disabled = true
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "START PRACTICE"
+
+[node name="StatusLabel" type="Label" parent="SafeArea/RootVBox/ContentRow/NotePanel/NoteMargin/NoteVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+text = "Choose a note before starting practice."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="AnalyticsPanel" type="PanelContainer" parent="SafeArea/RootVBox/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="AnalyticsMargin" type="MarginContainer" parent="SafeArea/RootVBox/ContentRow/AnalyticsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="AnalyticsVBox" type="VBoxContainer" parent="SafeArea/RootVBox/ContentRow/AnalyticsPanel/AnalyticsMargin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="AnalyticsTitleLabel" type="Label" parent="SafeArea/RootVBox/ContentRow/AnalyticsPanel/AnalyticsMargin/AnalyticsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 0.843137, 0.403922, 1)
+text = "SESSION ANALYTICS"
+horizontal_alignment = 1
+
+[node name="AccuracySummaryLabel" type="Label" parent="SafeArea/RootVBox/ContentRow/AnalyticsPanel/AnalyticsMargin/AnalyticsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+text = "Select a note to view recent practice accuracy, wins, and attempts."
+autowrap_mode = 3
+
+[node name="HistoryLabel" type="Label" parent="SafeArea/RootVBox/ContentRow/AnalyticsPanel/AnalyticsMargin/AnalyticsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.83, 0.88, 1, 1)
+text = "Recent sessions will appear here once you finish a practice battle."
+autowrap_mode = 3

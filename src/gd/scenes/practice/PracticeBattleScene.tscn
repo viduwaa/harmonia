@@ -1,0 +1,439 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://src/gd/ui/PracticeBattleScene.gd" id="1_battle"]
+[ext_resource type="FontFile" path="res://src/gd/assets/ui/fonts/menu_button.ttf" id="2_title"]
+[ext_resource type="FontFile" path="res://src/gd/assets/ui/fonts/PixeloidSans.ttf" id="3_body"]
+[ext_resource type="Script" path="res://src/gd/ui/FrequencySpectrumGraph.gd" id="4_graph"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.0784314, 0.0705882, 0.141176, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.847059, 0.615686, 0.239216, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
+bg_color = Color(0.847059, 0.596078, 0.188235, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.827451, 0.392157, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lane"]
+bg_color = Color(0.137255, 0.0941176, 0.266667, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.847059, 0.615686, 0.239216, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_meter"]
+bg_color = Color(0.05, 0.04, 0.09, 1.0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.847059, 0.615686, 0.239216, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_meter_normal"]
+bg_color = Color(0.137255, 0.0941176, 0.266667, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.847059, 0.615686, 0.239216, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="PracticeBattleScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_battle")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0901961, 0.164706, 0.25098, 1)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="RootVBox" type="VBoxContainer" parent="SafeArea"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="TopHudRow" type="HBoxContainer" parent="SafeArea/RootVBox"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="PlayerHudCard" type="PanelContainer" parent="SafeArea/RootVBox/TopHudRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="PlayerHudMargin" type="MarginContainer" parent="SafeArea/RootVBox/TopHudRow/PlayerHudCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="PlayerHudVBox" type="VBoxContainer" parent="SafeArea/RootVBox/TopHudRow/PlayerHudCard/PlayerHudMargin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PlayerHpLabel" type="Label" parent="SafeArea/RootVBox/TopHudRow/PlayerHudCard/PlayerHudMargin/PlayerHudVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.843137, 0.403922, 1)
+text = "HARM • 100 / 100"
+
+[node name="PlayerHpBar" type="ProgressBar" parent="SafeArea/RootVBox/TopHudRow/PlayerHudCard/PlayerHudMargin/PlayerHudVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="EnemyHudCard" type="PanelContainer" parent="SafeArea/RootVBox/TopHudRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="EnemyHudMargin" type="MarginContainer" parent="SafeArea/RootVBox/TopHudRow/EnemyHudCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="EnemyHudVBox" type="VBoxContainer" parent="SafeArea/RootVBox/TopHudRow/EnemyHudCard/EnemyHudMargin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="EnemyHpLabel" type="Label" parent="SafeArea/RootVBox/TopHudRow/EnemyHudCard/EnemyHudMargin/EnemyHudVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.843137, 0.403922, 1)
+text = "SLIME • 100 / 100"
+horizontal_alignment = 2
+
+[node name="EnemyHpBar" type="ProgressBar" parent="SafeArea/RootVBox/TopHudRow/EnemyHudCard/EnemyHudMargin/EnemyHudVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="StageCard" type="PanelContainer" parent="SafeArea/RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="StageMargin" type="MarginContainer" parent="SafeArea/RootVBox/StageCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="StageVBox" type="VBoxContainer" parent="SafeArea/RootVBox/StageCard/StageMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="BattleTitleLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(1, 0.843137, 0.403922, 1)
+text = "PITCH MATCH"
+horizontal_alignment = 1
+
+[node name="StageArena" type="HBoxContainer" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="PlayerStandIn" type="PanelContainer" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/StageArena"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_lane")
+
+[node name="PlayerStandInLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/StageArena/PlayerStandIn"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.0
+offset_top = -18.0
+offset_right = 52.0
+offset_bottom = 18.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+text = "HARM"
+horizontal_alignment = 1
+
+[node name="EnemyStandIn" type="PanelContainer" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/StageArena"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_lane")
+
+[node name="EnemyStandInLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/StageArena/EnemyStandIn"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.0
+offset_top = -18.0
+offset_right = 52.0
+offset_bottom = 18.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+text = "SLIME"
+horizontal_alignment = 1
+
+[node name="NoteLaneCard" type="PanelContainer" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 120)
+theme_override_styles/panel = SubResource("StyleBoxFlat_lane")
+
+[node name="NoteLaneMargin" type="MarginContainer" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/NoteLaneCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 14
+
+[node name="NoteLaneVBox" type="VBoxContainer" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/NoteLaneCard/NoteLaneMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TargetNoteLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/NoteLaneCard/NoteLaneMargin/NoteLaneVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.603922, 1, 0.603922, 1)
+text = "--"
+horizontal_alignment = 1
+
+[node name="DetectedNoteLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/NoteLaneCard/NoteLaneMargin/NoteLaneVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+text = "--"
+horizontal_alignment = 1
+
+[node name="LiveHoldLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/NoteLaneCard/NoteLaneMargin/NoteLaneVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.603922, 1, 0.603922, 1)
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TimeLeftBar" type="ProgressBar" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 14)
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="FrequencyMeterCard" type="PanelContainer" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 150)
+theme_override_styles/panel = SubResource("StyleBoxFlat_meter")
+
+[node name="MeterMargin" type="MarginContainer" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/FrequencyMeterCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="MeterVBox" type="VBoxContainer" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/FrequencyMeterCard/MeterMargin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="MeterHeaderRow" type="HBoxContainer" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/FrequencyMeterCard/MeterMargin/MeterVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MeterTargetLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/FrequencyMeterCard/MeterMargin/MeterVBox/MeterHeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.843137, 0.403922, 1)
+text = "TARGET  --  (0.0 Hz)"
+horizontal_alignment = 0
+
+[node name="MeterDetectedLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/FrequencyMeterCard/MeterMargin/MeterVBox/MeterHeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+text = "--"
+horizontal_alignment = 2
+
+[node name="SpectrumGraph" type="Control" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/FrequencyMeterCard/MeterMargin/MeterVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 90)
+script = ExtResource("4_graph")
+
+[node name="MeterBottomRow" type="HBoxContainer" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/FrequencyMeterCard/MeterMargin/MeterVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MatchModeLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/FrequencyMeterCard/MeterMargin/MeterVBox/MeterBottomRow"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.83, 0.88, 1, 1)
+text = "MATCH"
+
+[node name="OctaveMatchModeButton" type="OptionButton" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/FrequencyMeterCard/MeterMargin/MeterVBox/MeterBottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(150, 0)
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+item_count = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_meter_normal")
+
+[node name="MeterStatusLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox/FrequencyMeterCard/MeterMargin/MeterVBox/MeterBottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+text = "--"
+horizontal_alignment = 2
+
+[node name="FeedbackLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.95, 0.94, 0.86, 1)
+text = "Select a steady pitch and hold the target note."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="StatusLabel" type="Label" parent="SafeArea/RootVBox/StageCard/StageMargin/StageVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.83, 0.88, 1, 1)
+text = "Preparing practice battle..."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ActionRow" type="HBoxContainer" parent="SafeArea/RootVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MicToggleButton" type="Button" parent="SafeArea/RootVBox/ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Enable Mic"
+
+[node name="RetryButton" type="Button" parent="SafeArea/RootVBox/ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+disabled = true
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Retry"
+
+[node name="BackToNotesButton" type="Button" parent="SafeArea/RootVBox/ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Switch Note"
+
+[node name="ExitButton" type="Button" parent="SafeArea/RootVBox/ActionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+text = "Exit Practice"

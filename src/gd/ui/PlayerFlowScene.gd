@@ -2,11 +2,13 @@ extends Control
 
 const _DEBUG_SCENE_PATH: String = "res://src/gd/scenes/debug/TestScene.tscn"
 const _EXPLORE_WORLD_SCENE_PATH: String = "res://src/gd/scenes/world/ExploreWorldScene.tscn"
+const _MICROPHONE_CALIBRATION_SCENE_PATH: String = "res://src/gd/scenes/audio/MicrophoneCalibrationScene.tscn"
 const _AUDIO_PROCESSOR_PATH: String = "/root/AudioProcessor"
 const _BATTLE_MANAGER_PATH: String = "/root/BattleManager"
 
 @onready var _debug_tools_button: Button = %DebugToolsButton
 @onready var _explore_world_button: Button = %ExploreWorldButton
+@onready var _calibrate_microphone_button: Button = %CalibrateMicrophoneButton
 @onready var _toggle_listening_button: Button = %ToggleListeningButton
 @onready var _reset_battle_button: Button = %ResetBattleButton
 @onready var _action_status_label: Label = %ActionStatusLabel
@@ -20,6 +22,7 @@ func _ready() -> void:
 	_debug_tools_button.visible = OS.is_debug_build()
 	_debug_tools_button.pressed.connect(_on_debug_tools_button_pressed)
 	_explore_world_button.pressed.connect(_on_explore_world_button_pressed)
+	_calibrate_microphone_button.pressed.connect(_on_calibrate_microphone_button_pressed)
 	_toggle_listening_button.pressed.connect(_on_toggle_listening_button_pressed)
 	_reset_battle_button.pressed.connect(_on_reset_battle_button_pressed)
 
@@ -101,6 +104,12 @@ func _on_debug_tools_button_pressed() -> void:
 
 func _on_explore_world_button_pressed() -> void:
 	_open_explore_world()
+
+
+func _on_calibrate_microphone_button_pressed() -> void:
+	var result: Error = get_tree().change_scene_to_file(_MICROPHONE_CALIBRATION_SCENE_PATH)
+	if result != OK:
+		push_warning("PlayerFlowScene: Failed to open microphone calibration scene.")
 
 
 func _open_explore_world() -> void:

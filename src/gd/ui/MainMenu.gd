@@ -1,7 +1,9 @@
 extends Control
 
 const NEW_GAME_SCENE_PATH: String = "res://src/gd/scenes/world/ExploreWorldScene.tscn"
-const PRACTICE_MODE_SCENE_PATH: String = "res://src/gd/scenes/player/PlayerFlowScene.tscn"
+const PRACTICE_MODE_SCENE_PATH: String = "res://src/gd/scenes/practice/PracticeSetupScene.tscn"
+const PROFILE_SELECT_SCENE_PATH: String = "res://src/gd/scenes/menu/ProfileSelectScene.tscn"
+const GAME_STATE_MANAGER_PATH: String = "/root/GameStateManager"
 const FLOAT_ANIMATION_NAME: StringName = &"menu_float"
 const FADE_IN_ANIMATION_NAME: StringName = &"fade_in"
 
@@ -12,6 +14,8 @@ const FADE_IN_ANIMATION_NAME: StringName = &"fade_in"
 @onready var _exit_button: Button = %ExitButton
 @onready var _options_popup: PanelContainer = %OptionsPopup
 @onready var _close_options_button: Button = %CloseOptionsButton
+@onready var _profile_switch_button: Button = %ProfileSwitchButton
+@onready var _active_profile_label: Label = %ActiveProfileLabel
 @onready var _menu_float_animation_player: AnimationPlayer = %MenuFloatAnimationPlayer
 @onready var _fade_animation_player: AnimationPlayer = %FadeAnimationPlayer
 
@@ -26,10 +30,12 @@ func _ready() -> void:
 	_practice_mode_button.pressed.connect(_on_practice_mode_pressed)
 	_exit_button.pressed.connect(_on_exit_pressed)
 	_close_options_button.pressed.connect(_on_close_options_pressed)
+	_profile_switch_button.pressed.connect(_on_profile_switch_pressed)
 
 	_load_game_button.disabled = true
 	_load_game_button.tooltip_text = "Save/load flow is reserved for the final persistence hookup."
 	_options_popup.visible = false
+	_update_active_profile_label()
 	_new_game_button.grab_focus()
 	_play_intro_animations()
 
@@ -90,6 +96,10 @@ func _on_practice_mode_pressed() -> void:
 	_change_scene(PRACTICE_MODE_SCENE_PATH, "practice mode")
 
 
+func _on_profile_switch_pressed() -> void:
+	_change_scene(PROFILE_SELECT_SCENE_PATH, "profile selection")
+
+
 func _on_close_options_pressed() -> void:
 	_options_popup.visible = false
 	_options_button.grab_focus()
@@ -97,6 +107,19 @@ func _on_close_options_pressed() -> void:
 
 func _on_exit_pressed() -> void:
 	get_tree().quit()
+
+
+func _update_active_profile_label() -> void:
+	var game_state: Node = get_node_or_null(GAME_STATE_MANAGER_PATH)
+	var active_profile_name: String = ""
+	if game_state != null and game_state.has_method("get_active_profile_name"):
+		active_profile_name = String(game_state.call("get_active_profile_name")).strip_edges()
+	if active_profile_name.is_empty():
+		_active_profile_label.text = "PROFILE: NONE"
+		_profile_switch_button.tooltip_text = "Choose a player profile."
+		return
+	_active_profile_label.text = "PROFILE: %s" % active_profile_name.to_upper()
+	_profile_switch_button.tooltip_text = "Switch away from %s." % active_profile_name
 
 
 func _change_scene(scene_path: String, scene_label: String) -> void:

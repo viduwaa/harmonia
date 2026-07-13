@@ -4,6 +4,7 @@ const AUDIO_PROCESSOR_PATH: String = "/root/AudioProcessor"
 const LOCAL_DATA_MANAGER_PATH: String = "/root/LocalDataManager"
 const MAIN_MENU_SCENE_PATH: String = "res://src/gd/scenes/menu/MainMenuScene.tscn"
 const PLAYER_FLOW_SCENE_PATH: String = "res://src/gd/scenes/player/PlayerFlowScene.tscn"
+const PROFILE_SELECT_SCENE_PATH: String = "res://src/gd/scenes/menu/ProfileSelectScene.tscn"
 const DEFAULT_MIN_SIGNAL_DB: float = -58.0
 const DEFAULT_MIN_CONFIDENCE: float = 0.12
 const DEFAULT_STABLE_FRAMES: int = 3
@@ -396,7 +397,7 @@ func _on_test_mic_pressed() -> void:
 
 func _on_save_continue_pressed() -> void:
 	if _persist_calibration():
-		_open_scene(PLAYER_FLOW_SCENE_PATH)
+		_open_scene(PROFILE_SELECT_SCENE_PATH)
 	else:
 		_guidance_label.text = "Calibration could not be saved. Check LocalDataManager availability."
 
@@ -406,7 +407,10 @@ func _on_reset_defaults_pressed() -> void:
 
 
 func _on_back_pressed() -> void:
-	_open_scene(MAIN_MENU_SCENE_PATH)
+	if _local_data_manager != null and _local_data_manager.has_method("has_audio_calibration") and bool(_local_data_manager.call("has_audio_calibration")):
+		_open_scene(PROFILE_SELECT_SCENE_PATH)
+	else:
+		_open_scene(MAIN_MENU_SCENE_PATH)
 
 
 func _on_min_signal_slider_changed(value: float) -> void:
