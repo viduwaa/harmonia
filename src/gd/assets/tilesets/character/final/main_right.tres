@@ -1,9 +1,9 @@
 [gd_resource type="SpriteFrames" format=3 uid="uid://c1bdour6pjq08"]
 
-[ext_resource type="Texture2D" uid="uid://biu1xrq3a3kh7" path="res://src/gd/assets/tilesets/character/luke_walk_left.png" id="1_1b2g4"]
-[ext_resource type="Texture2D" uid="uid://cs40agpaueehn" path="res://src/gd/assets/tilesets/character/walk_up_down.png" id="1_64wbe"]
-[ext_resource type="Texture2D" uid="uid://bpj2wp2f0t75v" path="res://src/gd/assets/tilesets/character/idle.png" id="1_nncxx"]
-[ext_resource type="Texture2D" uid="uid://dd6ksii440tc8" path="res://src/gd/assets/tilesets/character/luke_walk_right.png" id="2_64wbe"]
+[ext_resource type="Texture2D" uid="uid://rjup3gqhv5ei" path="res://src/gd/assets/tilesets/character/luke_walk_left.png" id="1_1b2g4"]
+[ext_resource type="Texture2D" uid="uid://b57y0btis6g6" path="res://src/gd/assets/tilesets/character/walk_up_down.png" id="1_64wbe"]
+[ext_resource type="Texture2D" uid="uid://qgve8h1pwfmo" path="res://src/gd/assets/tilesets/character/idle.png" id="1_nncxx"]
+[ext_resource type="Texture2D" uid="uid://bwoo4sn26fp7o" path="res://src/gd/assets/tilesets/character/luke_walk_right.png" id="2_64wbe"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qw56j"]
 atlas = ExtResource("1_nncxx")

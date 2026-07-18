@@ -1,7 +1,7 @@
 [gd_resource type="TileSet" format=3 uid="uid://2aqmgjp08opt"]
 
-[ext_resource type="Texture2D" uid="uid://cnenfm8cyhrv" path="res://src/gd/assets/tilesets/lighv2/map1_1.png" id="1_ip2aa"]
-[ext_resource type="Texture2D" uid="uid://kcpmrxw2wg7o" path="res://src/gd/assets/tilesets/lighv2/map1_2.png" id="2_s2a0w"]
+[ext_resource type="Texture2D" uid="uid://uuj06bfm5va8" path="res://src/gd/assets/tilesets/lighv2/map1_1.png" id="1_ip2aa"]
+[ext_resource type="Texture2D" uid="uid://cda0xcbhm0ren" path="res://src/gd/assets/tilesets/lighv2/map1_2.png" id="2_s2a0w"]
 [ext_resource type="Texture2D" uid="uid://cvaw1yrc278rf" path="res://src/gd/assets/tilesets/lighv2/map1_3.png" id="3_s2a0w"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nv5a4"]
@@ -226,6 +226,6 @@ physics_layer_0/collision_layer = 1
 terrain_set_0/mode = 0
 terrain_set_0/terrain_0/name = "Terrain 0"
 terrain_set_0/terrain_0/color = Color(0.83137256, 0.64705884, 0.3254902, 1)
-sources/0 = SubResource("TileSetAtlasSource_nv5a4")
 sources/1 = SubResource("TileSetAtlasSource_1y8l5")
 sources/2 = SubResource("TileSetAtlasSource_41mr6")
+sources/0 = SubResource("TileSetAtlasSource_nv5a4")
